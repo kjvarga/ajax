@@ -1,12 +1,12 @@
 = Ajax
 
-<b>A Ruby on Rails plugin to augment a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users, such as testing, SEO and browser history.</b>
+<b>Ajax augments a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users. Issues like SEO/Crawlability, browser history, deep-linking and testing.</b>
 
-The Ajax philosophy is that you shouldn't have to develop for AJAX:  Your code shouldn't change; your tests shouldn't change; and the way Google sees your site shouldn't change.
+The Ajax philosophy is that <b>you shouldn't have to develop for AJAX</b>:  Your code shouldn't change; your tests shouldn't change; and the way Google sees your site shouldn't change (ed: this may {change}[]).
 
 The beauty of Ajax is that your Rails application only ever sees traditional requests, so it does not have to be "Ajax aware".
 
-Ajax is being used live in production on altnet.com[http://altnet.com], if you would like to try it out (as of May 1st 2010 or thereabouts).
+As of the end of April, 2010, Ajax is being used live in production on altnet.com[http://altnet.com].  Try it out and create a wicked playlists while you're at it!
 
 == Install
 
@@ -73,7 +73,7 @@ Ajax is being used live in production on altnet.com[http://altnet.com], if you w
    
 == Introduction
 
-Ajax handles these common problems:
+=== Features and Support
 
 * SEO/Crawlability/Google Analytics support
 * Browser History
@@ -83,8 +83,9 @@ Ajax handles these common problems:
 * Lazy-loaded Assets
 * Activating Tabs
 * Request Rewriting & Redirecting
-
-Ajax converts a traditional Rails application to use a completely AJAX frontend.
+* <b>{Jammit}[http://documentcloud.github.com/jammit/] compatible</b> with {these new helpers}[http://github.com/kjvarga/jammit/commit/27d5f27f4c6d4347c444b5e1a42dbb7c6c85462c].  Also supported are stylesheets with embedded images.
+  
+<b>Ajax augments a traditional Rails application with a completely AJAX frontend.</b>
 
 What do I mean by "completely AJAX"?  Everyone uses AJAX.  What we mean when we say "completely AJAX" is that the main page is only loaded once.  Every link now loads content via AJAX.
 
@@ -120,17 +121,19 @@ By default the current layout is sent in the <tt>Ajax-Info</tt> header.  This ca
 
 [title]      Sets the page title.
 [tab]        jQuery selector, triggers the <tt>activate</tt> event on matched element(s).
-[container]  jQuery selector, the container to receive the content (default:  <tt>default_container</tt>).
+[container]  jQuery selector, the container to receive the content (default:  <tt>ajax.default_container</tt>).
 [assets]     Hash of JavaScript and CSS assets to load <tt>{ :javascripts => [], :stylesheets => [] }</tt>
 [callbacks]  List of string callbacks to execute after assets have finished loading.
 
 === Robots and External APIS
 
-<b>We detect robots by their User-Agent strings.</b>  If a robot is detected the Ajax handling is bypassed and the robot sees the traditional Rails application.
+<b>We detect robots by their User-Agent strings.</b>  If a robot is detected the Ajax handling is bypassed and the robot sees the traditional Rails application.  The robot will see traditional links and requests for those pages will load traditionally and bypass all Ajax handling.
 
-By default any AJAX or non-GET requests pass through unmodified.
+Check out the {robot User-Agent detection}[http://github.com/kjvarga/ajax/blob/master/lib/ajax/helpers/robot_helper.rb].   If we cannot identify a robot, the robot will receive a redirect on each request for a traditional URL.  Requests for hashed URLs will only render the framework because there will be no JavaScript to trigger loading the inner contents.  It's important that the User-Agent list be kept up-to-date, or some other method of detecting robots is found.  IP address perhaps?
 
-If you need to expose external APIs you can do so using a regular expression that is matched against incoming URLs.
+<b>By default any AJAX or non-GET requests pass through unmodified.</b>
+
+If you need to expose external APIs you can do so using a regular expression that is matched against incoming URLs.  See <b>Documentation->Configuration->Excepted Links</b>.
 
 == Compatibility
 
