@@ -4,7 +4,7 @@ module Ajax
   include Ajax::Helpers
   
   class << self
-    attr_writer :logger
+    attr_writer :logger, :framework_path
   end
 
   # Return a logger instance.
@@ -38,6 +38,13 @@ module Ajax
     @enabled = !!value
   end
 
+  # Return the path to the framework page.
+  #
+  # Default: <tt>/ajax/framework</tt>
+  def self.framework_path
+    @framework_path ||= '/ajax/framework'
+  end
+  
   # Return a boolean indicating whether to enable lazy loading assets.
   # There are currently issues with some browsers when using this feature.
   #

@@ -73,7 +73,7 @@ module Rack
       end
 
       def rewrite_to_render_ajax_framework
-        rewrite('/ajax/framework')
+        rewrite(::Ajax.framework_path)
       end
 
       private
