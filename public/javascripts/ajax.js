@@ -172,9 +172,13 @@ var AjaxAssets = function(array, type) {
 };
 
 /**
- * Class Ajax
+ * = Class Ajax
  *
- * Options:
+ * == Options
+ *
+ * We extend self with the <tt>options</tt> array.  This allows you to set
+ * any instance variable on the instance.
+ *
  *    <tt>enabled</tt>  boolean indicating whether the plugin is enabled.
  *      Callbacks that you set in the Ajax-Info header or directly on
  *      this instance will still be executed.  They will not be queued,
@@ -217,6 +221,9 @@ var AjaxAssets = function(array, type) {
  *
  *    window.ajax.prependOnLoad(function() { doSomething(args); });
  *
+ * We also trigger a global 'ajax.onload' event that you can bind to to execute
+ * a callback on every page load.
+ *
  * KJV 2010-04-22: I've experienced problems with Safari using String callbacks.  YMMV.
  * Browser support for callbacks is patchy at this time so lazy-loading is
  * not recommended.
@@ -226,6 +233,9 @@ var Ajax = function(options) {
   
   /**
    * Options
+   *
+   * Extend self with the options Array.  This allows you to set any instance
+   * variable on the Ajax instance.
    */
   self.options = {
     enabled: true,
@@ -239,6 +249,7 @@ var Ajax = function(options) {
     callbacks: [],
     loaded: false,
     lazy_load_assets: false,
+    current_request: undefined,
 
     // For initial position of the loading icon.  Often the mouse does not
     // move so position it by the link that was clicked.
@@ -307,18 +318,41 @@ var Ajax = function(options) {
 
   /**
    * jQuery Address callback triggered when the address changes.
+   * Loads the current address using AJAX.
+   *
+   * If the inner content was pre-rendered (as in after a redirect),
+   * then <tt>loaded_by_framwork</tt> should be false.
+   *
+   * jQuery Address will still fire a request when the page loads,
+   * so we ignore that request if <tt>loaded_by_framwork</tt> is false.
    */
   self.addressChanged = function() {
     if (document.location.pathname != '/') { return false; }
     if (window.ajax.disable_address_intercept == true) {return false;}
-    if (typeof(self.loaded_by_framework) == 'undefined' || self.loaded_by_framework != true) {
+    if (!self.loaded_by_framework) {
       self.loaded_by_framework = true;
       return false;
     }
 
-    self.loadPage({
-      url: $.address.value().replace(/\/\//, '/')
-    });
+    // Ensure that the URL ends with '#' if we are on root. This
+    // will not trigger addressChanged().
+    if (document.location.pathname == '/'
+      && document.location.href.indexOf('#') == -1) {
+      document.location.href = document.location.href + '#';
+    }
+
+    // Clean up the URL before making the request.  If the URL changes
+    // as a result of this, update it, which will trigger this
+    // callback again.
+    var url = encodeURI($.address.value()).replace(/\/\//, '/');
+    if (url != $.address.value()) {
+      $.address.value(url);
+      return false;
+    } else {
+      self.loadPage({
+        url: url
+      });
+    }
     return true;
   };
 
@@ -339,22 +373,34 @@ var Ajax = function(options) {
    */
   self.loadPage = function(options) {
     if (!self.enabled) {
-      document.location = options.url;
+      document.location.href = options.url;
       return true;
     }
     self.loaded = false;
     self.showLoadingImage();
 
-    jQuery.ajax({
+    if (self.current_request !== undefined) {
+      try {
+        self.current_request.abort();
+        console.log('[ajax] aborting current request');
+      } catch(e) {
+        console.log('[ajax] abort failed!', e);
+      }
+    }
+
+    self.current_request = jQuery.ajax({
+      cache: false,
       url: options.url,
       method: options.method || 'GET',
       beforeSend: self.setRequestHeaders,
       success: self.responseHandler,
+      dataType: 'html',
       complete: function(XMLHttpRequest, responseText) {
         // Scroll to the top of the page.
         $(document).scrollTop(0);
         self.hideLoadingImage();
         self.loaded = true;
+        self.current_request = undefined;
       },
       error: function(XMLHttpRequest, textStatus, errorThrown) {
         var responseText = XMLHttpRequest.responseText;
@@ -381,6 +427,15 @@ var Ajax = function(options) {
   };
 
   /**
+   * host
+   *
+   * Return the current host with protocol and with no trailing slash.
+   */
+  self.host = function() {
+    return $.address.baseURL().replace(new RegExp(document.location.pathname), '');
+  };
+
+  /**
    * linkClicked
    *
    * Called when the an AJAX-enabled link is clicked.
@@ -389,10 +444,8 @@ var Ajax = function(options) {
    */
   self.linkClicked = function(event) {
     if (document.location.pathname != '/') {
-      var url = $.address.baseURL().replace(new RegExp(document.location.pathname), '')
-      url += '/#/' + $(this).attr('data-deep-link');
-      url.replace(/\/\//, '/');
-      document.location = url;
+      var url = ('/#/' + $(this).attr('data-deep-link')).replace(/\/\//, '/');
+      document.location.href = url;
     } else {
       self.last_click_coords = { pageX: event.pageX, pageY: event.pageY };
       $.address.value($(this).attr('data-deep-link'));
