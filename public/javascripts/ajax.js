@@ -465,7 +465,10 @@ var Ajax = function(options) {
     var container = data.container === undefined ? $(self.default_container) : $(data.container);
 
     // Redirect?  Let the JS execute.  It will set the new window location.
-    if (responseText && responseText.match(/try\s{\swindow\.location\.href/)) { return true; }
+    if (responseText && responseText.match(/try\s{\swindow\.location\.href/)) {
+      jQuery.globalEval(responseText);
+      return true;
+    }
 
     /**
      * Extract the body
