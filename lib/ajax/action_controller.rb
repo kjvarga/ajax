@@ -1,6 +1,6 @@
 module Ajax
   module ActionController
-    def self.included(klass)      
+    def self.included(klass)
       klass.class_eval do
         alias_method_chain :render, :ajax
         alias_method_chain :redirect_to_full_url, :ajax
@@ -62,16 +62,23 @@ module Ajax
       def redirect_to_full_url_with_ajax(url, status)
         return redirect_to_full_url_without_ajax(url, status) unless Ajax.is_enabled?
         raise DoubleRenderError if performed?
-        
+
+        original_url = url
         if url == request.headers["Referer"] && !request.headers['Ajax-Info'].blank?
           url = request.headers['Ajax-Info']['referer']
           Ajax.logger.debug("[ajax] using referer #{url} from Ajax-Info")
         end
 
-        if !Ajax.exclude_path?(url) && !Ajax.is_hashed_url?(url)
-          url = Ajax.hashed_url_from_traditional(url)
-          Ajax.logger.info("[ajax] rewrote redirect to #{url}")
+        if !Ajax.exclude_path?(url)
+          if url =~ %r[#{Ajax.framework_path}]
+            url = url.sub(%r[#{Ajax.framework_path}], '/')
+          end
+
+          if !Ajax.is_hashed_url?(url)
+            url = Ajax.hashed_url_from_traditional(url)
+          end
         end
+        Ajax.logger.info("[ajax] rewrote redirect from #{original_url} to #{url}")
 
         session[:redirected_to] = url
         if request.xhr?
@@ -94,7 +101,7 @@ module Ajax
       #
       def render_with_ajax(options = nil, extra_options = {}, &block)
         return render_without_ajax(options, extra_options, &block) unless Ajax.is_enabled?
-        
+
         original_args = [options, extra_options]
         if request.xhr?
 
