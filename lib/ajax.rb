@@ -2,16 +2,16 @@ require 'ajax/helpers'
 
 module Ajax
   include Ajax::Helpers
-  
+
   class << self
     attr_writer :logger, :framework_path
   end
 
   # Return the full path to the root of the Ajax plugin/gem directory.
   def self.root
-    @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))  
+    @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
   end
-  
+
   # Return a logger instance.
   #
   # Use the Rails logger by default, assign nil to turn off logging.
@@ -33,7 +33,7 @@ module Ajax
   class << self
     alias_method :enabled?, :is_enabled?
   end
-  
+
   # Set to false to disable this plugin completely.
   #
   # ActionController and ActionView helpers are still mixed in but
@@ -49,7 +49,7 @@ module Ajax
   def self.framework_path
     @framework_path ||= '/ajax/framework'
   end
-  
+
   # Return a boolean indicating whether to enable lazy loading assets.
   # There are currently issues with some browsers when using this feature.
   #
@@ -67,7 +67,7 @@ module Ajax
   def self.lazy_load_assets=(value)
     @lazy_load_assets = !!value
   end
-  
+
   # Return a boolean indicating whether the plugin is being mock tested.
   #
   # Mocking forces the environment to be returned after Ajax processing

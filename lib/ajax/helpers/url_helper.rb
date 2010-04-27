@@ -14,7 +14,7 @@ module Ajax
       def is_hashed_url?(url)
         !!(encode_and_parse_url(url).fragment=~ %r[^\/])
       end
-      
+
       # Return a hashed URL using the fragment of <tt>url</tt>
       def hashed_url_from_fragment(url)
         url_host(url) + ('/#/' + (encode_and_parse_url(url).fragment || '')).gsub(/\/\//, '/')
@@ -34,11 +34,11 @@ module Ajax
       end
 
       protected
-      
+
       def encode_and_parse_url(url)
         URI.parse(URI.encode(url).gsub("%23", "#"))
       end
-       
+
       def url_host(url)
         if url.match(/^(\w+\:\/\/[^\/]+)\/?/)
           $1

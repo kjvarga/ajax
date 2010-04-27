@@ -22,11 +22,11 @@ module Ajax
         end
         nil
       end
-    
+
       # Call with a User Agent string
       def is_robot?(user_agent)
         !!self.robot_for(user_agent)
-      end    
+      end
     end
   end
 end

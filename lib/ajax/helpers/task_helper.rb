@@ -3,14 +3,14 @@ module Ajax
     module TaskHelper
       INSTALL_FILES = %w[
         app/controllers/ajax_controller.rb
-        app/views/ajax/framework.html.erb   
-        config/initializers/ajax.rb   
+        app/views/ajax/framework.html.erb
+        config/initializers/ajax.rb
         public/javascripts/ajax.js
         public/javascripts/jquery.address-1.2rc.js
         public/javascripts/jquery.address-1.2rc.min.js
         public/javascripts/jquery.json-2.2.min.js
         public/images/ajax-loading.gif]
-      
+
       UPDATE_JAVASCRIPT_FILES = %w[
         public/javascripts/ajax.js]
 
@@ -22,7 +22,7 @@ module Ajax
           FileUtils.mkdir_p(File.dirname(to_file)) unless File.directory?(File.dirname(to_file))
           FileUtils.cp(from_file, to_file)
           return true
-        end        
+        end
       rescue Exception => e
         e
       end
@@ -35,7 +35,7 @@ module Ajax
       rescue Exception => e
         e
       end
-              
+
       def show_result(file)
         result = yield file
         return unless verbose
@@ -47,7 +47,7 @@ module Ajax
           puts "created: #{file}"
         else
           puts "skipped: #{file}"
-        end    
+        end
       end
     end
   end

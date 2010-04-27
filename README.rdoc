@@ -18,7 +18,7 @@ As of the end of April, 2010, Ajax is being used live in production on altnet.co
 
 2. <tt>bundle install</tt>
 3. <tt>rake ajax:install</tt>
-    
+
 === Rails 2.x.x
 
 <b> As a Gem</b>
@@ -70,7 +70,7 @@ As of the end of April, 2010, Ajax is being used live in production on altnet.co
         enabled: true,
         lazy_load_assets: false
       });
-   
+
 == Introduction
 
 === Features and Support
@@ -84,12 +84,12 @@ As of the end of April, 2010, Ajax is being used live in production on altnet.co
 * Activating Tabs
 * Request Rewriting & Redirecting
 * <b>{Jammit}[http://documentcloud.github.com/jammit/] compatible</b> with {these new helpers}[http://github.com/kjvarga/jammit/commit/27d5f27f4c6d4347c444b5e1a42dbb7c6c85462c].  Also supported are stylesheets with embedded images.
-  
+
 <b>Ajax augments a traditional Rails application with a completely AJAX frontend.</b>
 
 What do I mean by "completely AJAX"?  Everyone uses AJAX.  What we mean when we say "completely AJAX" is that the main page is only loaded once.  Every link now loads content via AJAX.
 
-But if we do that, the URL will never change and we will have no history, because that is how browsers determine history.  It turns out the only way to change the URL without causing the browser to issue a new request, is to modify the named anchor - or "hashed" - part of the URL.  
+But if we do that, the URL will never change and we will have no history, because that is how browsers determine history.  It turns out the only way to change the URL without causing the browser to issue a new request, is to modify the named anchor - or "hashed" - part of the URL.
 
 So now your traditional links auto-magically load content via AJAX into a page container and update the browser URL with the new URL.  You have all the benefits of AJAX as well as history and link bookmarkability.
 
@@ -127,7 +127,7 @@ By default the current layout is sent in the <tt>Ajax-Info</tt> header.  This ca
 
 === Robots and External APIS
 
-<b>We detect robots by their User-Agent strings.</b>  If a robot is detected the Ajax handling is bypassed and the robot sees the traditional Rails application.  The robot will see traditional links and requests for those pages will load traditionally and bypass all Ajax handling.
+<b>We detect robots by their User-Agent strings.</b>  If a robot is detected the Ajax handling is bypassed and the robotsees the traditional Rails application.  The robot will see traditional links and requests for those pages will load traditionally and bypass all Ajax handling.
 
 Check out the {robot User-Agent detection}[http://github.com/kjvarga/ajax/blob/master/lib/ajax/helpers/robot_helper.rb].   If we cannot identify a robot, the robot will receive a redirect on each request for a traditional URL.  Requests for hashed URLs will only render the framework because there will be no JavaScript to trigger loading the inner contents.  It's important that the User-Agent list be kept up-to-date, or some other method of detecting robots is found.  IP address perhaps?
 
@@ -148,7 +148,7 @@ The following JavaScript libraries are required and included in the plugin:
 
   * Rails 2.3.4 running Ruby 1.8.7 and Ruby 1.9
   * Rails 2.3.5 running Ruby 1.8.7 and Ruby 1.9
-  
+
 === Browsers:
 
 (See {jQuery address supported browsers}[http://www.asual.com/jquery/address/docs/].)
@@ -173,7 +173,7 @@ It is important to be able to disable the plugin when you don't want it interfer
 <b>Callbacks added directly to the <tt>window.ajax</tt> instance will still be executed, and they will execute immediately.</b>
 
 To disable the plugin in your environment file:
-  
+
   # config/environments/test.rb
   Ajax.enabled = false
 
@@ -228,7 +228,7 @@ Links can be excepted by passing in strings or regular expressions to <tt>Ajax.e
   # config/initializers/ajax.rb
   Ajax.exclude_paths %w[ /login /logout /signup /altnet-pro /my-account/edit /user-session/new ]
   Ajax.exclude_paths [%r[\/my-account\/.*]]
-  
+
 Typically, we except pages that require HTTPS, like signup forms, because including secure forms on an insecure page often triggers a browser warning.
 
 Excepted links when rendered do not contain the <tt>data-deep-link</tt> attribute if they are rendered with the <tt>link_to</tt> (or any other url) helper method.
@@ -244,11 +244,11 @@ You can use <tt>Ajax.get_header</tt> to inspect <tt>Ajax-Info</tt> header values
 In controllers, <tt>ajax_header</tt> uses an <tt>after_filter</tt> to add content to the response.  It therefore accepts passing a block instead of a static value, as well as <tt>:only</tt> and <tt>:except</tt> modifiers, e.g:
 
   # app/controllers/application_controller.rb
-  ajax_header :title { dynamic_page_attribute(:page_title) || "Music @ Altnet" }  
+  ajax_header :title { dynamic_page_attribute(:page_title) || "Music @ Altnet" }
   ajax_header :assets do
     { :stylesheets => [current_controller_stylesheet] }
   end
-  
+
   # app/controllers/browse_controller.rb
   ajax_header :tab, '#header .nav li:contains(Music)', :only => [:music, :artists, :albums, :tracks, :new_releases]
   ajax_header :tab, '#header .nav li:contains(Playlists)',  :only => :playlists
@@ -257,7 +257,7 @@ In controllers, <tt>ajax_header</tt> uses an <tt>after_filter</tt> to add conten
   # app/controllers/activity_controller.rb
   ajax_header :tab, '#header .nav li:contains(Realtime)'
   ajax_header :assets, { :javascripts => javascript_files_for_expansion(:juggernaut_jquery) }
-  
+
 Array and Hash values are merged so you can call <tt>ajax_header</tt> multiple times.  For example, the asset Hash and Array values will be merged.
 
 === In Views
@@ -311,7 +311,7 @@ You can bind callbacks directly to the <tt>window.ajax</tt> object in your view,
     window.ajax.prependOnLoad(function() {
       $(document).trigger('player.init');
     });
-  
+
 In the <tt>onLoad</tt> callback I'm scoping everything to <tt>window</tt> to <b>avoid scoping issues</b> in different browsers.
 
 <b><tt>window.ajax.prependOnLoad</tt><b> adds the callback to the front of the queue.

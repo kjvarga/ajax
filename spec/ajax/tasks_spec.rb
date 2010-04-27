@@ -21,11 +21,11 @@ context 'task' do
     FileUtils.rm_r(TMP_DIR) if File.exists?(TMP_DIR)
     FileUtils.mkdir(TMP_DIR)
   end
-  
+
   it "rails root should be tmp/" do
     Rails.root.should == TMP_DIR
   end
-  
+
   context 'install' do
     it "should install files" do
       Rake::Task['ajax:install'].invoke
@@ -34,7 +34,7 @@ context 'task' do
       end
     end
   end
-  
+
   context 'update' do
     context 'javascript' do
       it "should update files" do
@@ -44,5 +44,5 @@ context 'task' do
         end
       end
     end
-  end  
+  end
 end

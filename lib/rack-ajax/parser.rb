@@ -40,7 +40,7 @@ module Rack
       # Inspect the headers first - if there are any - so we don't
       # look in the database unneccessarily.
       #
-      # Sets the result in a header {Ajax-Info}[user_is_robot] so we 
+      # Sets the result in a header {Ajax-Info}[user_is_robot] so we
       # don't have to repeat this check in the application.
       def user_is_robot?
         return @user_is_robot if instance_variable_defined?(:@user_is_robot)
@@ -53,7 +53,7 @@ module Rack
         ::Ajax.set_header(@env, :robot, @user_is_robot)
         @user_is_robot
       end
-      
+
       def rewrite_to_traditional_url_from_fragment
         rewrite(::Ajax.traditional_url_from_fragment(@env['REQUEST_URI']))
       end
@@ -106,7 +106,7 @@ module Rack
         headers.reverse_merge!({'Content-Type' => 'text/html'})
         [code, headers, [msg.to_s]]
       end
-      
+
       def rack_response(*args)
         self.class.rack_response(*args)
       end

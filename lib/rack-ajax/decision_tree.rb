@@ -1,7 +1,7 @@
 module Rack
   class Ajax
     module DecisionTree
-      
+
       # Decision tree for Rack rewrites and redirects.
       #
       # To use your own decision tree set it on the <tt>Ajax</tt> instance with:
@@ -17,7 +17,7 @@ module Rack
         @@default_decision_tree ||= Proc.new do
           ::Ajax.logger.debug("[ajax] rack session #{@env['rack.session'].inspect}")
           ::Ajax.logger.debug("[ajax] Ajax-Info #{@env['Ajax-Info'].inspect}")
-        
+
           if !::Ajax.exclude_path?(@env['PATH_INFO'] || @env['REQUEST_URI'])
             if ajax_request?
               if hashed_url? # the browser never sends the hashed part
@@ -52,7 +52,7 @@ module Rack
                 end
               end
             end
-          end          
+          end
         end
       end
     end

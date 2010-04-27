@@ -26,7 +26,7 @@ module Ajax
       def set_header(object, key, value)
         headers = object.is_a?(::ActionController::Response) ? object.headers : object
         key = key.to_s
-        
+
         info = case headers["Ajax-Info"]
         when String
           JSON.parse(headers["Ajax-Info"]) rescue {}
@@ -50,7 +50,7 @@ module Ajax
             info[key].is_a?(Array)
           value = info[key].concat(value)
         end
-      
+
         info[key] = value
         headers["Ajax-Info"] = info.to_json
       end
@@ -63,7 +63,7 @@ module Ajax
       def get_header(object, key)
         headers = object.is_a?(::ActionController::Request) ? object.headers : object
         key = key.to_s
-        
+
         info = case headers["Ajax-Info"]
         when String
           JSON.parse(headers["Ajax-Info"]) rescue {}

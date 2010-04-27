@@ -9,7 +9,7 @@ module Ajax #:nodoc:
         extend RequestHelper
         extend RobotHelper
         extend UrlHelper
-      end     
+      end
     end
   end
 end

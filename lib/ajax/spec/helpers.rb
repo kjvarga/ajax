@@ -32,7 +32,7 @@ module Ajax
       def should_set_ajax_request_header(key, value)
         Ajax.get_header(@env, key).should == value
       end
-            
+
       def should_rewrite_to(url)
         should_be_a_valid_response
 

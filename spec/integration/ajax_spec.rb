@@ -17,26 +17,26 @@ context 'Rack::Ajax' do
   after :all do
     unmock_ajax
   end
-  
+
   context "XMLHttpRequest" do
     context "hashed url" do
       it "should rewrite GET request" do
         xhr(:get, '/?query1#/Beyonce?query2')
         should_rewrite_to('/Beyonce?query2')
       end
-  
+
       it "should not modify POST" do
         xhr(:post, '/#/user_session/new?param1=1&param2=2')
         should_not_modify_request
       end
     end
-  
+
     context "traditional url" do
       it "should not be modified" do
         xhr(:get, '/Beyonce')
         should_not_modify_request
       end
-  
+
       it "should not be modified" do
         xhr(:post, '/user_session/new?param1=1&param2=2')
         should_not_modify_request
@@ -49,7 +49,7 @@ context 'Rack::Ajax' do
       get('/')
       should_not_modify_request
     end
-    
+
     it "should not be modified" do
       get('/?query_string')
       should_not_modify_request
@@ -65,17 +65,17 @@ context 'Rack::Ajax' do
     before :each do
       @user = login_robot_user
     end
-  
+
     it "should not modify request for root" do
       get('/')
       should_not_modify_request
     end
-  
+
     it "should not modify traditional requests" do
       get('/Beyonce')
       should_not_modify_request
     end
-  
+
     context "request hashed" do
       context "non-root url" do
         it "should not modify the request" do
@@ -83,7 +83,7 @@ context 'Rack::Ajax' do
           should_not_modify_request
         end
       end
-  
+
       context "root url" do
         it "should rewrite to traditional url" do
           get('/#/Beyonce?query2')
@@ -92,18 +92,18 @@ context 'Rack::Ajax' do
       end
     end
   end
-  
+
   context "regular user" do
     it "should not modify request for root" do
       get('/')
       should_not_modify_request
     end
-  
+
     it "should ignore query string on root url" do
       get('/?query1#/Beyonce?query2')
       should_rewrite_to('/Beyonce?query2')
     end
-  
+
     context "request hashed" do
       context "non-root url" do
         it "should redirect to hashed part at root" do
@@ -111,7 +111,7 @@ context 'Rack::Ajax' do
           should_redirect_to('/#/Beyonce?query2')
         end
       end
-  
+
       context "root url" do
         it "should rewrite to traditional url" do
           get('/#/Beyonce?query2')
@@ -119,7 +119,7 @@ context 'Rack::Ajax' do
         end
       end
     end
-  
+
     context "request traditional url" do
       it "should not be modified" do
         get('/')
@@ -129,12 +129,12 @@ context 'Rack::Ajax' do
         get('/?query_string')
         should_not_modify_request
       end
-  
+
       it "should redirect GET request" do
         get('/Beyonce')
         should_redirect_to('/#/Beyonce')
       end
-  
+
       it "should not modify non-GET request" do
         %w[post put delete].each do |method|
           send(method, '/')

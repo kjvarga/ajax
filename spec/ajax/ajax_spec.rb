@@ -10,9 +10,9 @@ context Ajax do
     it "should be able to be changed" do
       Ajax.framework_path = '/my/path'
       Ajax.framework_path.should == '/my/path'
-    end  
+    end
   end
-  
+
   it "should have a root method" do
     Ajax.root.should == File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
   end

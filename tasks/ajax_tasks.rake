@@ -16,13 +16,13 @@ namespace :ajax do
       puts "Coming soon..."
     end
   end
-  
+
   namespace :update do
     desc "Overwrite public/javascripts/ajax.js with the latest version."
     task :javascript do
       UPDATE_JAVASCRIPT_FILES.map do |file|
         show_result(file) { |file| copy_and_overwrite(file) }
       end
-    end    
+    end
   end
 end

@@ -5,7 +5,7 @@ require 'json'
 module Rack
   class Ajax
     extend Rack::Ajax::DecisionTree
-    
+
     cattr_accessor :decision_tree
     attr_accessor :user, :request, :params
 

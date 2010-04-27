@@ -22,11 +22,11 @@ describe Rack::Ajax::Parser, :type => :integration do
     end
     should_set_ajax_request_header('robot', true)
   end
-  
+
   it "should recognize regular users" do
     call_rack('/', { 'HTTP_USER_AGENT' => 'Safari' }) do
       rack_response(user_is_robot?)
-    end      
+    end
     should_set_ajax_request_header('robot', false)
   end
 
