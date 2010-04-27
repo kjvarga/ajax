@@ -176,7 +176,7 @@ var AjaxAssets = function(array, type) {
  *
  * == Options
  *
- * We extend self with the <tt>options</tt> array.  This allows you to set
+ * We extend self with the <tt>options</tt> array.  This allows you to set 
  * any instance variable on the instance.
  *
  *    <tt>enabled</tt>  boolean indicating whether the plugin is enabled.
@@ -242,6 +242,7 @@ var Ajax = function(options) {
     default_container: undefined,
     loaded_by_framework: false,
     show_loading_image: true,
+    disable_next_address_intercept: false,
     loading_image: 'img#ajax-loading',
     loading_image_path: '/images/ajax-loading.gif',
     javascripts: undefined,
@@ -250,7 +251,7 @@ var Ajax = function(options) {
     loaded: false,
     lazy_load_assets: false,
     current_request: undefined,
-
+    
     // For initial position of the loading icon.  Often the mouse does not
     // move so position it by the link that was clicked.
     last_click_coords: undefined
@@ -319,16 +320,19 @@ var Ajax = function(options) {
   /**
    * jQuery Address callback triggered when the address changes.
    * Loads the current address using AJAX.
-   *
+   * 
    * If the inner content was pre-rendered (as in after a redirect),
    * then <tt>loaded_by_framwork</tt> should be false.
    *
-   * jQuery Address will still fire a request when the page loads,
+   * jQuery Address will still fire a request when the page loads, 
    * so we ignore that request if <tt>loaded_by_framwork</tt> is false.
    */
   self.addressChanged = function() {
     if (document.location.pathname != '/') { return false; }
-    if (window.ajax.disable_address_intercept == true) {return false;}
+    if (self.disable_next_address_intercept) {
+      self.disable_next_address_intercept = false;
+      return false;
+    }
     if (!self.loaded_by_framework) {
       self.loaded_by_framework = true;
       return false;
@@ -336,11 +340,11 @@ var Ajax = function(options) {
 
     // Ensure that the URL ends with '#' if we are on root. This
     // will not trigger addressChanged().
-    if (document.location.pathname == '/'
+    if (document.location.pathname == '/' 
       && document.location.href.indexOf('#') == -1) {
       document.location.href = document.location.href + '#';
     }
-
+    
     // Clean up the URL before making the request.  If the URL changes
     // as a result of this, update it, which will trigger this
     // callback again.
@@ -348,7 +352,7 @@ var Ajax = function(options) {
     if (url != $.address.value()) {
       $.address.value(url);
       return false;
-    } else {
+    } else {    
       self.loadPage({
         url: url
       });
@@ -387,7 +391,7 @@ var Ajax = function(options) {
         console.log('[ajax] abort failed!', e);
       }
     }
-
+    
     self.current_request = jQuery.ajax({
       cache: false,
       url: options.url,
@@ -432,9 +436,9 @@ var Ajax = function(options) {
    * Return the current host with protocol and with no trailing slash.
    */
   self.host = function() {
-    return $.address.baseURL().replace(new RegExp(document.location.pathname), '');
+    return $.address.baseURL().replace(new RegExp(document.location.pathname), '');  
   };
-
+  
   /**
    * linkClicked
    *
