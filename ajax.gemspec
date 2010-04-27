@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga"]
-  s.date = %q{2010-04-22}
-  s.description = %q{Ajax augments a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users. Issues like SEO/Crawlability, browser history, deep-linking and testing.}
+  s.date = %q{2010-04-26}
+  s.description = %q{Augment a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users, such as testing, SEO and browser history.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
      "lib/ajax/helpers.rb",
      "lib/ajax/helpers/request_helper.rb",
      "lib/ajax/helpers/robot_helper.rb",
+     "lib/ajax/helpers/task_helper.rb",
      "lib/ajax/helpers/url_helper.rb",
      "lib/ajax/railtie.rb",
      "lib/ajax/routes.rb",
@@ -51,18 +52,21 @@ Gem::Specification.new do |s|
      "rails/init.rb",
      "rails/install.rb",
      "rails/uninstall.rb",
+     "spec/ajax/ajax_spec.rb",
      "spec/ajax/helpers_spec.rb",
      "spec/ajax/request_helper_spec.rb",
+     "spec/ajax/tasks_spec.rb",
      "spec/integration/ajax_spec.rb",
      "spec/rack-ajax/parser_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
+     "spec/support/file_macros.rb",
      "tasks/ajax_tasks.rake"
   ]
   s.homepage = %q{http://github.com/kjvarga/ajax}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{A framework to augment a traditional Rails application with a completely AJAX frontend.}
 
   if s.respond_to? :specification_version then

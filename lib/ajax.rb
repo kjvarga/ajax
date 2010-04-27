@@ -7,6 +7,11 @@ module Ajax
     attr_writer :logger, :framework_path
   end
 
+  # Return the full path to the root of the Ajax plugin/gem directory.
+  def self.root
+    @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))  
+  end
+  
   # Return a logger instance.
   #
   # Use the Rails logger by default, assign nil to turn off logging.

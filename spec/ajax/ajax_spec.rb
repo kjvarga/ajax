@@ -12,4 +12,8 @@ context Ajax do
       Ajax.framework_path.should == '/my/path'
     end  
   end
+  
+  it "should have a root method" do
+    Ajax.root.should == File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
+  end
 end

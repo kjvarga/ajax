@@ -1,6 +1,6 @@
-require 'ajax/helpers/request_helper'
-require 'ajax/helpers/robot_helper'
-require 'ajax/helpers/url_helper'
+Dir[File.join(File.dirname(__FILE__), 'helpers', '*')].map do |file|
+  require file
+end
 
 module Ajax #:nodoc:
   module Helpers #:nodoc:
@@ -8,7 +8,7 @@ module Ajax #:nodoc:
       klass.class_eval do
         extend RequestHelper
         extend RobotHelper
-        extend UrlHelper   
+        extend UrlHelper
       end     
     end
   end
