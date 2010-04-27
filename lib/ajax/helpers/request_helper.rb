@@ -14,13 +14,22 @@ module Ajax
         end
       end
 
-      # Hash and/or Array values are merged so you can set multiple values
+      # Set the value at <tt>key</tt> in the <tt>Ajax-Info</tt> header
+      # in <tt>object</tt>.
+      #
+      # <tt>object</tt> can be a Hash or instance of <tt>ActionController::Request</tt>
+      # <tt>key</tt> Symbol or String hash key, converted to String
+      # <tt>value</tt> any value that con be converted to JSON
+      #
+      # All Hash and Array values are deep-merged.
+      # Hash keys are converted to Strings.
       def set_header(object, key, value)
         headers = object.is_a?(::ActionController::Response) ? object.headers : object
+        key = key.to_s
         
         info = case headers["Ajax-Info"]
         when String
-          JSON.parse(headers["Ajax-Info"])
+          JSON.parse(headers["Ajax-Info"]) rescue {}
         when Hash
           headers["Ajax-Info"]
         else
@@ -28,34 +37,42 @@ module Ajax
         end
 
         # Deep merge hashes
-        if info.has_key?(key.to_s) &&
+        if info.has_key?(key) &&
             value.is_a?(Hash) &&
-            info[key.to_s].is_a?(Hash)
-          value = info[key.to_s].merge(value, &DEEP_MERGE)
+            info[key].is_a?(Hash)
+          value = value.stringify_keys!
+          value = info[key].merge(value, &DEEP_MERGE)
         end
 
         # Concat arrays
-        if info.has_key?(key.to_s) &&
+        if info.has_key?(key) &&
             value.is_a?(Array) &&
-            info[key.to_s].is_a?(Array)
-          value = info[key.to_s].concat(value)
+            info[key].is_a?(Array)
+          value = info[key].concat(value)
         end
       
-        info[key.to_s] = value
+        info[key] = value
         headers["Ajax-Info"] = info.to_json
       end
 
+      # Return the value at key <tt>key</tt> from the <tt>Ajax-Info</tt> header
+      # in <tt>object</tt>.
+      #
+      # <tt>object</tt> can be a Hash or instance of <tt>ActionController::Request</tt>
+      # <tt>key</tt> Symbol or String hash key, converted to String
       def get_header(object, key)
         headers = object.is_a?(::ActionController::Request) ? object.headers : object
+        key = key.to_s
+        
         info = case headers["Ajax-Info"]
         when String
-          JSON.parse(headers["Ajax-Info"])
+          JSON.parse(headers["Ajax-Info"]) rescue {}
         when Hash
           headers["Ajax-Info"]
         else
           {}
         end
-        info[key.to_s]
+        info[key]
       end
 
       # Set one or more paths that can be accessed directly without the AJAX framework.
