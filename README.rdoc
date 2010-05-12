@@ -10,7 +10,7 @@ As of the end of April, 2010, Ajax is being used live in production on altnet.co
 
 == Install
 
-=== Rails 3
+=== Rails 3 (untested)
 
 1. Add the gem to your <tt>Gemspec</tt>
 
