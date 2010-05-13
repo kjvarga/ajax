@@ -9,7 +9,7 @@ module FileMacros
       identical_files?(first, second).should be(false)
     end
 
-    def (file)
+    def file_should_exist(file)
       File.exists?(file).should be(true)
     end
 
