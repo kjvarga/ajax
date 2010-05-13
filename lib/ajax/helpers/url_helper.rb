@@ -36,7 +36,7 @@ module Ajax
       protected
 
       def encode_and_parse_url(url)
-        URI.parse(URI.encode(url).gsub("%23", "#"))
+        URI.parse(URI.encode(url).gsub("%23", "#")) rescue URI.parse('/')
       end
 
       def url_host(url)

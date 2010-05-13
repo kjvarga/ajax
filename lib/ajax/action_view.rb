@@ -38,13 +38,21 @@ module Ajax
 
           # Insert the deep link unless the URL is traditional
           if !html_options.has_key?('data-deep-link') && !html_options.delete('traditional')
-            path = url_for(options)
+            case options
+            when Hash
+              options[:only_path] = true
+              path = url_for(options)
+            else
+              path = url_for(options)
 
-            # Is this path to be excluded?
-            unless Ajax.exclude_path?(path)
-              if path.match(%r[^(http:\/\/[^\/]*)(\/?.*)])
-                path = $2
+              # Strip out the protocol and host from the URL
+              if path =~ %r[#{root_url}]
+                path.sub!(%r[#{root_url}], '/')
               end
+            end
+
+            # Don't store a data-deep-link attribute if the path is excluded
+            unless Ajax.exclude_path?(path)
               html_options['data-deep-link'] = path
             end
           end

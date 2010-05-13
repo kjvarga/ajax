@@ -2,6 +2,8 @@ module Ajax
   module ActionController
     def self.included(klass)
       klass.class_eval do
+        include ClassMethods
+
         alias_method_chain :render, :ajax
         alias_method_chain :redirect_to_full_url, :ajax
 
@@ -26,7 +28,7 @@ module Ajax
         key, value = args.shift, args.shift
         value = block_given? ? Proc.new : value
 
-        prepend_after_filter(options) do |controller|
+        (self.is_a?(Class) ? self : self.class).prepend_after_filter(options) do |controller|
           if controller.request.xhr?
             value = value.is_a?(Proc) ? controller.instance_eval(&value) : value
             Ajax.set_header(controller.response, key, value)
@@ -63,15 +65,30 @@ module Ajax
         return redirect_to_full_url_without_ajax(url, status) unless Ajax.is_enabled?
         raise DoubleRenderError if performed?
 
+        special_redirect = false
         original_url = url
+
+        # If we have the full referrer in Ajax-Info, use that because it
+        # includes the fragment.
         if url == request.headers["Referer"] && !request.headers['Ajax-Info'].blank?
           url = request.headers['Ajax-Info']['referer']
           Ajax.logger.debug("[ajax] using referer #{url} from Ajax-Info")
         end
 
         if !Ajax.exclude_path?(url)
+          # Never redirect to the Ajax framework path, redirect to /
           if url =~ %r[#{Ajax.framework_path}]
             url = url.sub(%r[#{Ajax.framework_path}], '/')
+
+            # Special case:
+            #
+            # Changing protocol forces a redirect from root to root.
+            # The full request URL (including the hashed part) is
+            # in the browser.  So return JS to do the redirect and
+            # have it include the hashed part in the redirect URL.
+            if !request.xhr? && URI.parse(url).scheme != URI.parse(request.url).scheme
+              special_redirect = true
+            end
           end
 
           if !Ajax.is_hashed_url?(url)
@@ -80,11 +97,20 @@ module Ajax
         end
         Ajax.logger.info("[ajax] rewrote redirect from #{original_url} to #{url}")
 
-        session[:redirected_to] = url
-        if request.xhr?
-          render(:update) { |page| page.redirect_to(url) }
+        # Don't store session[:redirected_to] if doing a special redirect otherwise
+        # when the next request for root comes in it will think we really want
+        # to display the home page.
+        if special_redirect
+          session[:redirected_to] = nil
+          Ajax.logger.info("[ajax] returning special redirect JS")
+          render :partial => '/ajax/redirect_with_fragment', :locals => { :url => url }
         else
-          redirect_to_full_url_without_ajax(url, status)
+          session[:redirected_to] = url
+          if request.xhr?
+            render(:update) { |page| page.redirect_to(url) }
+          else
+            redirect_to_full_url_without_ajax(url, status)
+          end
         end
       end
 
