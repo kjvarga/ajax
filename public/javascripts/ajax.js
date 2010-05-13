@@ -1,13 +1,13 @@
-/**  
+/**
 *  Script lazy loader 0.5
 *  Copyright (c) 2008 Bob Matsuoka
 *
-*  This program is free software; you can redistribute it and/or 
+*  This program is free software; you can redistribute it and/or
 *  modify it under the terms of the GNU General Public License
 *  as published by the Free Software Foundation; either version 2
 *  of the License, or (at your option) any later version.
 */
- 
+
 var LazyLoader = {}; //namespace
 LazyLoader.timer = {};  // contains timers for scripts
 LazyLoader.scripts = [];  // contains called script references
@@ -24,22 +24,22 @@ LazyLoader.load = function(url, callback) {
       script.src = url;
       script.type = "text/javascript";
       $(script).appendTo("head");  // add script tag to head element
-      
+
       // was a callback requested
-      if (callback) {    
+      if (callback) {
         // test for onreadystatechange to trigger callback
-        script.onreadystatechange = function () {         
+        script.onreadystatechange = function () {
           if (script.readyState == 'loaded' || script.readyState == 'complete') {
             callback();
           }
         };
-                                    
+
         // test for onload to trigger callback
-        script.onload = function () {  
+        script.onload = function () {
           callback();
           return;
         };
-        
+
         // safari doesn't support either onload or readystate, create a timer
         // only way to do this in safari
         if (($.browser.webkit && !navigator.userAgent.match(/Version\/3/)) || $.browser.opera) { // sniff
@@ -151,12 +151,12 @@ var AjaxAssets = function(array, type) {
                  done = true;
                  if (callback)
                     callback();
-           
+
                  // Handle memory leak in IE
                  script.onload = script.onreadystatechange = null;
               }
            };
-        }       
+        }
       } else if (type == 'css') {
         if (url.match(/datauri/)) {
           $(DATA_URI_START + '<link type="text/css" rel="stylesheet" href="'+ url +'">' + DATA_URI_END).appendTo('head');
@@ -176,7 +176,7 @@ var AjaxAssets = function(array, type) {
  *
  * == Options
  *
- * We extend self with the <tt>options</tt> array.  This allows you to set 
+ * We extend self with the <tt>options</tt> array.  This allows you to set
  * any instance variable on the instance.
  *
  *    <tt>enabled</tt>  boolean indicating whether the plugin is enabled.
@@ -230,7 +230,7 @@ var AjaxAssets = function(array, type) {
  */
 var Ajax = function(options) {
   var self = this;
-  
+
   /**
    * Options
    *
@@ -251,7 +251,7 @@ var Ajax = function(options) {
     loaded: false,
     lazy_load_assets: false,
     current_request: undefined,
-    
+
     // For initial position of the loading icon.  Often the mouse does not
     // move so position it by the link that was clicked.
     last_click_coords: undefined
@@ -320,11 +320,11 @@ var Ajax = function(options) {
   /**
    * jQuery Address callback triggered when the address changes.
    * Loads the current address using AJAX.
-   * 
+   *
    * If the inner content was pre-rendered (as in after a redirect),
    * then <tt>loaded_by_framwork</tt> should be false.
    *
-   * jQuery Address will still fire a request when the page loads, 
+   * jQuery Address will still fire a request when the page loads,
    * so we ignore that request if <tt>loaded_by_framwork</tt> is false.
    */
   self.addressChanged = function() {
@@ -340,11 +340,11 @@ var Ajax = function(options) {
 
     // Ensure that the URL ends with '#' if we are on root. This
     // will not trigger addressChanged().
-    if (document.location.pathname == '/' 
+    if (document.location.pathname == '/'
       && document.location.href.indexOf('#') == -1) {
       document.location.href = document.location.href + '#';
     }
-    
+
     // Clean up the URL before making the request.  If the URL changes
     // as a result of this, update it, which will trigger this
     // callback again.
@@ -352,7 +352,7 @@ var Ajax = function(options) {
     if (url != $.address.value()) {
       $.address.value(url);
       return false;
-    } else {    
+    } else {
       self.loadPage({
         url: url
       });
@@ -391,7 +391,7 @@ var Ajax = function(options) {
         console.log('[ajax] abort failed!', e);
       }
     }
-    
+
     self.current_request = jQuery.ajax({
       cache: false,
       url: options.url,
@@ -436,9 +436,9 @@ var Ajax = function(options) {
    * Return the current host with protocol and with no trailing slash.
    */
   self.host = function() {
-    return $.address.baseURL().replace(new RegExp(document.location.pathname), '');  
+    return $.address.baseURL().replace(new RegExp(document.location.pathname), '');
   };
-  
+
   /**
    * linkClicked
    *
@@ -533,17 +533,17 @@ var Ajax = function(options) {
 
     /**
      * Load javascipts
-    */    
+    */
     if (self.lazy_load_assets && data.assets && data.assets.javascripts !== undefined) {
       var count = data.assets.javascripts.length;
       var callback;
-      
+
       jQuery.each(jQuery.makeArray(data.assets.javascripts), function(idx, url) {
         if (self.javascripts.loadedAsset(url)) {
           console.log('[ajax] skipping js', url);
           return true;
         }
-        
+
         // Execute callbacks once the last asset has loaded
         callback = (idx == count - 1) ? undefined : self.executeCallbacks;
         self.javascripts.loadAsset(url, callback);
@@ -554,7 +554,7 @@ var Ajax = function(options) {
     }
 
     $(document).trigger('ajax.onload');
-    
+
     /**
      * Set cookies - browsers don't seem to allow this
     */
@@ -625,7 +625,7 @@ var Ajax = function(options) {
       var marginLeft = parseInt(icon.css('marginLeft'), 10);
       marginTop      = isNaN(marginTop)  ? 0 : marginTop;
       marginLeft     = isNaN(marginLeft) ? 0 : marginLeft;
-      
+
       icon.css({
         position:   'absolute',
         left:       '50%',
