@@ -60,15 +60,20 @@ As of the end of April, 2010, Ajax is being used live in production on altnet.co
   skipped: app/views/ajax/framework.html.erb exists!
   ...
 
-=== Post Install
+== Getting Started
 
-1. Create layouts in <tt>app/views/layouts/ajax/</tt> that mimic your existing layouts.  See <b>Request Handling -> Layouts</b>.
-2. Instantiate an instance of the Ajax class in <tt>application.js</tt>.  For example:
+1. Ajax looks for an alternative layout to use with AJAX requests in <tt>app/views/layouts/ajax/</tt>.  Copy existing layouts into this directory and get them ready for AJAX by removing any HTML HEAD elements, everything but the inner BODY content.
+
+Your main layout should contain a container element that will receive page content.  Typically this would be the container below the page header.  If you don't have a static header, you can make the whole BODY element the container.
+
+Here is an {example of converting our <tt>layouts/application.html.haml</tt> to <tt>layouts/ajax/application.html.haml</tt>}[http://gist.github.com/373133/5a80a63ef69a883ed3c5630b68330b1036ad01ec].
+
+2. Instantiate an instance of the Ajax class in <tt>public/javascripts/application.js</tt>.  For example:
 
       window.ajax = new Ajax({
-        default_container: '#main',
-        enabled: true,
-        lazy_load_assets: false
+        default_container: '#main',  // jQuery selector of your container element
+        enabled: true,               // Enable/disable the plugin
+        lazy_load_assets: false      // YMMV
       });
 
 == Introduction
@@ -183,15 +188,35 @@ If you need to, you can check the state of the plugin with:
 
 Other onfiguration goes in <tt>config/initializers/ajax.rb</tt> such as indicating which links to except from the request processing.  See <b>Excepted Links</b>.
 
+Our <tt>config/initializers/ajax.rb</tt> file:
+
+  #
+  # Ajax configuration.
+  #
+
+  Ajax.enabled = true
+  Ajax.lazy_load_assets = false
+
+  # Excepted paths: allow these paths to pass through unmodified.
+  Ajax.exclude_paths %w[ /login /logout /signup /altnet-pro /my-account/edit /user-session/new /facebook_signup /facebook_login /facebook_link_account /health_check /reset-password/new]
+  Ajax.exclude_paths [%r[\/my-account\/.*]]
+  Ajax.exclude_paths [%r[\/admin.*]]
+  Ajax.exclude_paths [%r[\/newrelic.*]]
+
 == Ajax Layouts
 
 Typically AJAX content does not render a layout because we just want to update a fragment of a page.  Automatically turning off layouts when rendering AJAX is one option, but what about when we do want to use a layout?
 
-My solution is to first look in <tt>app/views/layouts/ajax/</tt> for a layout with the same name as the default layout for the current action.  If a layout is found, we use it, otherwise the default layout is used.
+Ajax looks for an alternative layout to use with AJAX requests in <tt>app/views/layouts/ajax/</tt>.  If a layout is found, we use it, otherwise the default layout is used. Copy existing layouts into this directory and get them ready for AJAX by removing any HTML HEAD elements, everything but the inner BODY content.
 
-In your Ajax layouts you can define callbacks, tabs to activate or the container to receive content.
+Your main layout should contain a container element that will receive page content.  Typically this would be the container below the page header.  If you don't have a static header, you can make the whole BODY element the container.
 
-For example, our layouts:
+In your Ajax layouts you can define callbacks, tabs to activate or the container to receive content. Using the <tt>ajax_header</tt> method:
+
+  # layouts/ajax/two_column.html.haml
+  ajax_header :container, '#column2'
+
+Our layouts:
 
   layouts/
     _assets.html.haml
@@ -203,9 +228,7 @@ For example, our layouts:
     single_column.html.haml
     two_column.html.haml
 
-Gists
-* {ajax/application.html.haml}[http://gist.github.com/373133#file_application.html.haml]
-* {ajax/two_column.html.haml}[http://gist.github.com/373133#file_two_column.html.haml]
+{Converting our <tt>layouts/application.html.haml</tt> to <tt>layouts/ajax/application.html.haml</tt>}[http://gist.github.com/373133/5a80a63ef69a883ed3c5630b68330b1036ad01ec].
 
 == Link Handling
 
