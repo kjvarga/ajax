@@ -109,4 +109,8 @@ module Ajax
       ::ActionView::Base.send(:include, Ajax::ActionView)
     end
   end
+
+  def self.version
+    @version ||= File.read(File.join(File.dirname(__FILE__), '..', 'VERSION')).strip
+  end
 end
