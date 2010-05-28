@@ -47,3 +47,11 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.rdoc_files.include('app/**/*.rb')
 end
+
+desc "Release a new patch version"
+task :release_new_version do
+  Rake::Task['version:bump:patch'].invoke
+  Rake::Task['github:release'].invoke
+  Rake::Task['git:release'].invoke
+  Rake::Task['gemcutter:release'].invoke
+end
