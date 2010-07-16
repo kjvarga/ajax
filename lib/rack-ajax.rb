@@ -1,6 +1,8 @@
 require 'rack-ajax/decision_tree'
 require 'rack-ajax/parser'
 require 'json'
+require 'yaml'
+require 'yaml/encoding' unless RUBY_VERSION.to_f == 1.9
 
 module Rack
   class Ajax
@@ -34,6 +36,7 @@ module Rack
       @parser = Parser.new(env)
       rack_response = @parser.instance_eval(&@decision_tree)
 
+
       # Clear the value of session[:redirected_to]
       unless env['rack.session'].nil?
         env['rack.session']['redirected_to'] = env['rack.session'][:redirected_to] = nil
@@ -49,7 +52,7 @@ module Rack
       # The Ajax::Spec::Helpers module includes a helper
       # method to test the result of a rewrite.
       if ::Ajax.is_mocked?
-        rack_response.nil? ? Rack::Ajax::Parser.rack_response(env.to_yaml) : rack_response
+        rack_response.nil? ? Rack::Ajax::Parser.rack_response(env.to_yaml(:Encoding => :Utf8)) : rack_response
       elsif !rack_response.nil?
         rack_response
       else

@@ -95,7 +95,7 @@ module Ajax
             url = Ajax.hashed_url_from_traditional(url)
           end
         end
-        Ajax.logger.info("[ajax] rewrote redirect from #{original_url} to #{url}")
+        Ajax.logger.info("[ajax] rewrote redirect from #{original_url} to #{url}") unless original_url == url
 
         # Don't store session[:redirected_to] if doing a special redirect otherwise
         # when the next request for root comes in it will think we really want
@@ -107,8 +107,17 @@ module Ajax
         else
           session[:redirected_to] = url
           if request.xhr?
-            render(:update) { |page| page.redirect_to(url) }
+            Ajax.logger.info("[ajax] detecting we are xhr. soft redirect")
+            redirect_path = URI.parse(url).select(:fragment).first
+            Ajax.logger.info("[ajax] redirect path is #{redirect_path}")
+            Ajax.set_header(response, :soft_redirect, redirect_path)
+            render :text => <<-END
+              <script type="text/javascript">
+                window.location.href = #{url.to_json};
+              </script>
+            END
           else
+            Ajax.logger.info("[ajax] not detecting we are xhr. Hard redirect!")
             redirect_to_full_url_without_ajax(url, status)
           end
         end

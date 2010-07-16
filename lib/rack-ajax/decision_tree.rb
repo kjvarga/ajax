@@ -15,7 +15,6 @@ module Rack
       # completeness.
       def default_decision_tree
         @@default_decision_tree ||= Proc.new do
-          ::Ajax.logger.debug("[ajax] rack session #{@env['rack.session'].inspect}")
           ::Ajax.logger.debug("[ajax] Ajax-Info #{@env['Ajax-Info'].inspect}")
 
           if !::Ajax.exclude_path?(@env['PATH_INFO'] || @env['REQUEST_URI'])

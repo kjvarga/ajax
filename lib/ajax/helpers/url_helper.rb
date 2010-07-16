@@ -36,9 +36,18 @@ module Ajax
       protected
 
       def encode_and_parse_url(url)
-        URI.parse(URI.encode(url).gsub("%23", "#")) rescue URI.parse('/')
+        if already_encoded?(url)
+          res = URI.parse(url.gsub("%23", "#")) rescue URI.parse('/')
+        else
+          res = URI.parse(URI.encode(url).gsub("%23", "#")) rescue URI.parse('/')
+        end
+        res
       end
-
+      
+      def already_encoded?(url)
+        URI.decode(url) != url rescue true
+      end
+      
       def url_host(url)
         if url.match(/^(\w+\:\/\/[^\/]+)\/?/)
           $1

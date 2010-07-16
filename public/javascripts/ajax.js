@@ -330,6 +330,7 @@ var Ajax = function(options) {
   self.addressChanged = function() {
     if (document.location.pathname != '/') { return false; }
     if (self.disable_next_address_intercept) {
+      console.log('skipping address intercept & resetting disable_next_address_intercept')
       self.disable_next_address_intercept = false;
       return false;
     }
@@ -341,18 +342,21 @@ var Ajax = function(options) {
     // Ensure that the URL ends with '#' if we are on root. This
     // will not trigger addressChanged().
     if (document.location.pathname == '/'
-      && document.location.href.indexOf('#') == -1) {
+        && document.location.href.indexOf('#') == -1) {
       document.location.href = document.location.href + '#';
     }
 
     // Clean up the URL before making the request.  If the URL changes
     // as a result of this, update it, which will trigger this
     // callback again.
-    var url = encodeURI($.address.value()).replace(/\/\//, '/');
+    console.log('cleaning up the url');
+    var url = ($.address.value()).replace(/\/\//, '/');
     if (url != $.address.value()) {
+      console.log('reloading because encoded uri ' + url + ' differs from current uri ' + $.address.value());
       $.address.value(url);
       return false;
     } else {
+      console.log('going ahead with load');
       self.loadPage({
         url: url
       });
@@ -380,21 +384,29 @@ var Ajax = function(options) {
       document.location.href = options.url;
       return true;
     }
+
+    if (options.url === undefined) {
+      console.log('[ajax] no url supplied ');
+      return false;
+    };
+
     self.loaded = false;
     self.showLoadingImage();
+    console.log('[ajax] loadPage ' + options.url);
 
     if (self.current_request !== undefined) {
-      try {
-        self.current_request.abort();
-        console.log('[ajax] aborting current request');
-      } catch(e) {
-        console.log('[ajax] abort failed!', e);
-      }
+      self.abortCurrentRequest();
     }
+
+    if ($.browser.msie) {
+      safe_url = encodeURI(options.url);
+    } else {
+      safe_url = options.url;
+    };
 
     self.current_request = jQuery.ajax({
       cache: false,
-      url: options.url,
+      url: safe_url,
       method: options.method || 'GET',
       beforeSend: self.setRequestHeaders,
       success: self.responseHandler,
@@ -411,6 +423,21 @@ var Ajax = function(options) {
         self.responseHandler(responseText, textStatus, XMLHttpRequest);
       }
     });
+  };
+
+
+  /**
+   * abortCurrentRequest
+   *
+   * Abort the current ajax request
+   */
+  self.abortCurrentRequest = function() {
+    try {
+      console.log('[ajax] aborting current request for url ' + self.current_request.url);
+      self.current_request.abort();
+    } catch(e) {
+      console.log('[ajax] abort failed!', e);
+    };
   };
 
   /**
@@ -447,14 +474,40 @@ var Ajax = function(options) {
    *
    */
   self.linkClicked = function(event) {
+    // The deep link must be a path.  A full URL shouldn't have
+    // made it through, but sometimes it can happen.  In this
+    // case, strip off the host and protocol.
+    if ($(this).attr('href') == '#') return false;
+    ajax_url = $(this).attr('data-deep-link');
+    if (ajax_url.match(/^https?:\/\//)) {
+      ajax_url = ajax_url.replace(/(https?:\/\/[^\/]*\/(.*))/, '$2');
+    }
     if (document.location.pathname != '/') {
-      var url = ('/#/' + $(this).attr('data-deep-link')).replace(/\/\//, '/');
+      var url = ('/#/' + ajax_url).replace(/\/\//, '/');
+      console.log('linkClicked 1: going to ' + url);
       document.location.href = url;
     } else {
       self.last_click_coords = { pageX: event.pageX, pageY: event.pageY };
-      $.address.value($(this).attr('data-deep-link'));
+      encoded_url = ajax.safeURL(ajax_url);
+      console.log('linkClicked 2: going to ' + ajax_url);
+      console.log('untouched url is ' + ajax_url + ', encoded is ' + encoded_url);
+      if ($.browser.msie) {
+        $.address.value(encoded_url);
+      }
+      else {
+        $.address.value(ajax_url);
+      }
     }
     return false;
+  };
+
+  self.safeURL = function(url) {
+    if (decodeURI(url)==url) {
+      encoded_url = encodeURI(url);
+    } else {
+      encoded_url = url;
+    };
+    return encoded_url;
   };
 
   /**
@@ -466,17 +519,19 @@ var Ajax = function(options) {
    */
   self.responseHandler = function(responseText, textStatus, XMLHttpRequest) {
     var data = self.processResponseHeaders(XMLHttpRequest);
+
+    if (data.soft_redirect !== undefined) {
+      console.log('**** data.soft_redirect is ' + data.soft_redirect)
+      $.address.value(data.soft_redirect);
+      return false;
+    };
+
     var container = data.container === undefined ? $(self.default_container) : $(data.container);
-
-    // Redirect?  Let the JS execute.  It will set the new window location.
-    if (responseText && responseText.match(/try\s{\swindow\.location\.href/)) {
-      jQuery.globalEval(responseText);
-      return true;
-    }
-
     /**
-     * Extract the body
-    */
+     * Full page response.  The best we can do is to extract the body
+     * and display that.  Additionally, if the container to update
+     * is present in the response, just use that.
+     */
     if (responseText.search(/<\s*body[^>]*>/) != -1) {
       var start = responseText.search(/<\s*body[^>]*>/);
       start += responseText.match(/<\s*body[^>]*>/)[0].length;
@@ -484,6 +539,11 @@ var Ajax = function(options) {
 
       console.log('Extracting body ['+start+'..'+end+'] chars');
       responseText = responseText.substr(start, end - start);
+
+      var body = $(responseText);
+      if (body.size() > 0 && body.find(container.selector).size() > 0) {
+        responseText = body.find(container.selector).html();
+      }
     }
 
     // Handle special header instructions
@@ -724,7 +784,7 @@ var Ajax = function(options) {
   };
 
   self.teaser = function(callback) {
-    return new String(callback).slice(0,50);
+    return new String(callback).slice(0,200).replace(/\n/g, ' ');
   };
 
   /**
