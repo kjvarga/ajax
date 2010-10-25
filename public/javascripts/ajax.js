@@ -518,6 +518,13 @@ var Ajax = function(options) {
    *
    */
   self.responseHandler = function(responseText, textStatus, XMLHttpRequest) {
+    
+    self.last_request_object = XMLHttpRequest;
+    console.log("[AJAX] in response handler! status: " + self.last_request_object.status);
+    if(self.last_request_object.status == 0) {
+      console.log("[AJAX] aborting response handler! ");
+      return;
+    }
     var data = self.processResponseHeaders(XMLHttpRequest);
 
     if (data.soft_redirect !== undefined) {
@@ -553,6 +560,8 @@ var Ajax = function(options) {
     //  callback - execute a callback
     if (data.title !== undefined) {
       console.log('Using page title '+data.title);
+      // commenting this out until we fix ' char bug, removing % chars from page titles for now
+      // $.address.title(encodeURIComponent(data.title));
       $.address.title(data.title);
     }
 
@@ -653,6 +662,11 @@ var Ajax = function(options) {
    * Stop watching the mouse position.
    */
   self.hideLoadingImage = function() {
+    // check if a new request has already started
+    if (self.current_request.status == 0) {
+      console.log("[AJAX] aborting hideLoadingImage.. ")
+      return
+    }
     if (!self.show_loading_image) { return; }
     $(document).unbind('mousemove', self.updateImagePosition);
     $(self.loading_image).hide();
