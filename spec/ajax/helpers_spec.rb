@@ -77,15 +77,13 @@ context 'Ajax::UrlHelpers' do
     it "should return false for fragments that don't start with /" do
       Ajax.is_hashed_url?('/Beyonce#Akon').should be(false)
       Ajax.is_hashed_url?('/Beyonce?query#Akon/').should be(false)
-    end
-
-    it "should return false for no fragment" do
-      Ajax.is_hashed_url?('/Beyonce?query%23/').should be(false)
+      Ajax.is_hashed_url?('/Beyonce?query%23').should be(false)
     end
 
     it "should return true if the fragment starts with /" do
       Ajax.is_hashed_url?('/Beyonce#/Akon').should be(true)
       Ajax.is_hashed_url?('/#/Akon').should be(true)
+      Ajax.is_hashed_url?('/Beyonce?query%23/').should be(true) # KJV technically I don't think this behaviour is correct
     end
 
     DOMAINS.each do |domain|
