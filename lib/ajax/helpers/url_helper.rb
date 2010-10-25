@@ -43,11 +43,11 @@ module Ajax
         end
         res
       end
-      
+
       def already_encoded?(url)
         URI.decode(url) != url rescue true
       end
-      
+
       def url_host(url)
         if url.match(/^(\w+\:\/\/[^\/]+)\/?/)
           $1

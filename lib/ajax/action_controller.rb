@@ -91,7 +91,7 @@ module Ajax
             end
           end
 
-          if !Ajax.is_hashed_url?(url)
+          if !Ajax.is_hashed_url?(url) and !Ajax.is_robot?(request.user_agent)
             url = Ajax.hashed_url_from_traditional(url)
           end
         end
@@ -106,7 +106,7 @@ module Ajax
           render :partial => '/ajax/redirect_with_fragment', :locals => { :url => url }
         else
           session[:redirected_to] = url
-          if request.xhr?
+          if request.xhr? && Ajax.is_hashed_url?(url)
             Ajax.logger.info("[ajax] detecting we are xhr. soft redirect")
             redirect_path = URI.parse(url).select(:fragment).first
             Ajax.logger.info("[ajax] redirect path is #{redirect_path}")

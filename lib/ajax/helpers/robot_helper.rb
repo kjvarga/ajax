@@ -14,6 +14,7 @@ module Ajax
         {:name => 'WordPress', :user_agent_regex => /\bWordPress\b/i, :sample_agent_string => 'WordPress'},
         {:name => 'ZIBB', :user_agent_regex => /\bZIBB\b/i, :sample_agent_string => 'ZIBB'},
         {:name => 'ZyBorg', :user_agent_regex => /\bZyBorg\b/i, :sample_agent_string => 'ZyBorg'},
+        {:name => 'Facebook', :user_agent_regex => /\bfacebookexternalhit\b/i, :sample_agent_string => 'facebookexternalhit'}
       ]
 
       def robot_for(user_agent)
