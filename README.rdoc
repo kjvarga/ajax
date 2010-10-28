@@ -6,7 +6,7 @@ The Ajax philosophy is that <b>you shouldn't have to develop for AJAX</b>:  Your
 
 The beauty of Ajax is that your Rails application only ever sees traditional requests, so it does not have to be "Ajax aware".
 
-As of the end of April, 2010, Ajax is being used live in production on altnet.com[http://altnet.com].  Try it out and create a wicked playlists while you're at it!
+As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kazaa.com].  Try it out and create a wicked playlists while you're at it!
 
 == Install
 
