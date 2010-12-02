@@ -57,7 +57,7 @@ LazyLoader.load = function(url, callback) {
   } catch (e) {
     alert(e);
   }
-}
+};
 
 /**
  * AjaxAssets
@@ -140,7 +140,7 @@ var AjaxAssets = function(array, type) {
         var head = document.getElementsByTagName("head")[0];
         var script = document.createElement("script");
         script.src = url;
-        script.type = 'text/javascript'
+        script.type = 'text/javascript';
         head.appendChild(script);
         // Handle Script loading
         if (callback) {
@@ -202,8 +202,13 @@ var AjaxAssets = function(array, type) {
  *      image.  Used to append an image tag to the body element
  *      if an existing image is not found.  Default: /images/ajax-loading.gif
  *
- *      To customize image handling, override the <tt>showLoadingImage</tt> and
- *      <tt>hideLoadingImage</tt> methods.
+ *    <tt>show_loading_image_callback</tt> (optional) a method to call to show
+ *      the loading image.  Useful if you have more specific requirements as
+ *      to what you want to show and how you want to show it.
+ *
+ *    <tt>hide_loading_image_callback</tt> (requird if you use show_loading_image_callback) a method to call to hide
+ *      the loading image.  Useful if you have more specific requirements as
+ *      to what you want to show and how you want to show it.
  *
  * Callbacks:
  *
@@ -245,6 +250,8 @@ var Ajax = function(options) {
     disable_next_address_intercept: false,
     loading_image: 'img#ajax-loading',
     loading_image_path: '/images/ajax-loading.gif',
+    show_loading_image_callback: undefined, // called to show the loading image
+    hide_loading_image_callback: undefined, // called to hide the loading image
     javascripts: undefined,
     stylesheets: new AjaxAssets([], 'css'),
     callbacks: [],
@@ -260,7 +267,7 @@ var Ajax = function(options) {
   jQuery.extend(self, self.options);
 
   // Initialize on DOM ready
-  $(function() { self.init() });
+  $(function() { self.init(); });
 
   /**
    * Initializations run on DOM ready.
@@ -293,7 +300,7 @@ var Ajax = function(options) {
             var params = src.split('?')[1].split('&');
             jQuery.each(params, function(idx, param) {
               param = param.split('=');
-              if (param.length == 1) { return true; }
+              if (param.length == 1) { return true; } // continue
 
               switch(param[0]) {
                 case 'enabled':
@@ -305,6 +312,7 @@ var Ajax = function(options) {
                   console.log('[ajax] set param default_container=', self.default_container);
                   break;
               }
+              return undefined; // avoid lint warning
             });
           }
 
@@ -330,7 +338,7 @@ var Ajax = function(options) {
   self.addressChanged = function() {
     if (document.location.pathname != '/') { return false; }
     if (self.disable_next_address_intercept) {
-      console.log('skipping address intercept & resetting disable_next_address_intercept')
+      console.log('skipping address intercept & resetting disable_next_address_intercept');
       self.disable_next_address_intercept = false;
       return false;
     }
@@ -423,6 +431,7 @@ var Ajax = function(options) {
         self.responseHandler(responseText, textStatus, XMLHttpRequest);
       }
     });
+    return true;
   };
 
 
@@ -518,7 +527,7 @@ var Ajax = function(options) {
    *
    */
   self.responseHandler = function(responseText, textStatus, XMLHttpRequest) {
-    
+
     self.last_request_object = XMLHttpRequest;
     console.log("[AJAX] in response handler! status: " + self.last_request_object.status);
     if(self.last_request_object.status == 0) {
@@ -528,9 +537,9 @@ var Ajax = function(options) {
     var data = self.processResponseHeaders(XMLHttpRequest);
 
     if (data.soft_redirect !== undefined) {
-      console.log('**** data.soft_redirect is ' + data.soft_redirect)
+      console.log('**** data.soft_redirect is ' + data.soft_redirect);
       $.address.value(data.soft_redirect);
-      return false;
+      return;
     };
 
     var container = data.container === undefined ? $(self.default_container) : $(data.container);
@@ -577,10 +586,11 @@ var Ajax = function(options) {
       jQuery.each(jQuery.makeArray(data.assets.stylesheets), function(idx, url) {
         if (self.stylesheets.loadedAsset(url)) {
           console.log('[ajax] skipping css', url);
-          return true;
+          return true; // continue
         } else {
           self.stylesheets.loadAsset(url);
         }
+        return undefined;
       });
     }
 
@@ -589,7 +599,7 @@ var Ajax = function(options) {
     */
     console.log('Using container ',container.selector);
     console.log('Set data ',data);
-    container.data('ajax-info', data)
+    container.data('ajax-info', data);
     container.html(responseText);
 
     /**
@@ -610,12 +620,13 @@ var Ajax = function(options) {
       jQuery.each(jQuery.makeArray(data.assets.javascripts), function(idx, url) {
         if (self.javascripts.loadedAsset(url)) {
           console.log('[ajax] skipping js', url);
-          return true;
+          return true; // continue
         }
 
         // Execute callbacks once the last asset has loaded
         callback = (idx == count - 1) ? undefined : self.executeCallbacks;
         self.javascripts.loadAsset(url, callback);
+        return undefined;
       });
     } else {
       // Execute callbacks immediately
@@ -663,13 +674,17 @@ var Ajax = function(options) {
    */
   self.hideLoadingImage = function() {
     // check if a new request has already started
-    if (self.current_request.status == 0) {
-      console.log("[AJAX] aborting hideLoadingImage.. ")
-      return
+    if (self.current_request && self.current_request.status == 0) {
+      console.log("[AJAX] aborting hideLoadingImage.. ");
+      return;
     }
     if (!self.show_loading_image) { return; }
-    $(document).unbind('mousemove', self.updateImagePosition);
-    $(self.loading_image).hide();
+    if (!self.hide_loading_image_callback) {
+      $(document).unbind('mousemove', self.updateImagePosition);
+      $(self.loading_image).hide();
+    } else {
+      self.hide_loading_image_callback();
+    }
   };
 
   /**
@@ -677,39 +692,43 @@ var Ajax = function(options) {
    */
   self.showLoadingImage = function() {
     if (!self.show_loading_image) { return; }
+    if (!self.show_loading_image_callback) {
+      var icon = $(self.loading_image);
 
-    var icon = $(self.loading_image);
+      // Create the image if it doesn't exist
+      if (icon.size() == 0)  {
+        $('<img src="'+ self.loading_image_path +'" id="ajax-loading" alt="Loading..." />').hide().appendTo($('body'));
+        icon = $(self.loading_image);
+      }
 
-    // Create the image if it doesn't exist
-    if (icon.size() == 0)  {
-      $('<img src="'+ self.loading_image_path +'" id="ajax-loading" alt="Loading..." />').hide().appendTo($('body'));
-      icon = $(self.loading_image);
-    }
+      // Follow the mouse pointer
+      $(document).bind('mousemove', self.updateImagePosition);
 
-    // Follow the mouse pointer
-    $(document).bind('mousemove', self.updateImagePosition);
+      // Display at last click coords initially
+      if (self.last_click_coords !== undefined) {
+        self.updateImagePosition(self.last_click_coords);
 
-    // Display at last click coords initially
-    if (self.last_click_coords !== undefined) {
-      self.updateImagePosition(self.last_click_coords);
+      // Center it
+      } else {
+        var marginTop  = parseInt(icon.css('marginTop'), 10);
+        var marginLeft = parseInt(icon.css('marginLeft'), 10);
+        marginTop      = isNaN(marginTop)  ? 0 : marginTop;
+        marginLeft     = isNaN(marginLeft) ? 0 : marginLeft;
 
-    // Center it
+        icon.css({
+          position:   'absolute',
+          left:       '50%',
+          top:        '50%',
+          zIndex:     '99',
+          marginTop:  marginTop  + jQuery(window).scrollTop(),
+          marginLeft: marginLeft + jQuery(window).scrollLeft()
+        });
+      }
+      icon.show();
+
     } else {
-      var marginTop  = parseInt(icon.css('marginTop'), 10);
-      var marginLeft = parseInt(icon.css('marginLeft'), 10);
-      marginTop      = isNaN(marginTop)  ? 0 : marginTop;
-      marginLeft     = isNaN(marginLeft) ? 0 : marginLeft;
-
-      icon.css({
-        position:   'absolute',
-        left:       '50%',
-        top:        '50%',
-        zIndex:     '99',
-        marginTop:  marginTop  + jQuery(window).scrollTop(),
-        marginLeft: marginLeft + jQuery(window).scrollLeft()
-      });
+      self.show_loading_image_callback();
     }
-    icon.show();
   };
 
   /**
@@ -782,7 +801,7 @@ var Ajax = function(options) {
     if (dom_ready !== undefined && dom_ready) {
       $(function() {
         self.executeCallback(callback);
-      })
+      });
     } else {
       console.log('[ajax] executing callback', self.teaser(callback));
       try {
@@ -820,6 +839,6 @@ var Ajax = function(options) {
 
     return function(selector) {
       return selector.replace(sRE, '\\$1');
-    }
+    };
   })();
 };
