@@ -2,11 +2,73 @@
 
 <b>Ajax augments a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users. Issues like SEO/Crawlability, browser history, deep-linking and testing.</b>
 
-The Ajax philosophy is that <b>you shouldn't have to develop for AJAX</b>:  Your code shouldn't change; your tests shouldn't change; and the way Google sees your site shouldn't change (ed: this may {change}[]).
+The Ajax philosophy is that you shouldn't have to develop for AJAX.  Your code shouldn't change; your tests shouldn't change; and the way Google sees your site shouldn't change.
 
-The beauty of Ajax is that your Rails application only ever sees traditional requests, so it does not have to be "Ajax aware".
+The beauty of Ajax is that your Rails application only ever sees traditional requests, so it does not have to be "Ajax aware".  The Ajax framework does not interfere with your existing AJAX requests.  AJAX requests pass through the framework unmodified.  If the request headers contain the special <i>Ajax-Info</i> header then we invoke some additional Ajax framework handling.
 
-As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kazaa.com].  Try it out and create a wicked playlists while you're at it!
+As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kazaa.com].  Try it out and create some wicked playlists while you're at it!
+
+== Getting Started
+
+1. Ajax looks for a layout to use for an Ajax request in <tt>app/views/layouts/ajax/</tt>.  It looks for a layout with the same name as the default Rails layout for that action.  So copy your existing layouts into <tt>layouts/ajax/</tt> and get them ready for Ajax by removing any excess HTML, leaving just the content that will be inserted into the container.
+
+   Your main layout should contain a container element to receive page content.  Typically this would be a container below your page header.  If you don't have a static header, you can make the whole BODY element the container.
+
+   Here is an {example of converting our <tt>layouts/application.html.haml</tt> to <tt>layouts/ajax/application.html.haml</tt>}[http://gist.github.com/373133/5a80a63ef69a883ed3c5630b68330b1036ad01ec].
+
+2. Instantiate an instance of the Ajax class in <tt>public/javascripts/application.js</tt>.  For example:
+
+    // public/javascripts/application.js
+    if (typeof(Ajax) != 'undefined') {
+      window.ajax = new Ajax({
+        default_container: '#main',  // jQuery selector of your container element
+        enabled: true,               // Enable/disable the plugin
+        lazy_load_assets: false      // YMMV
+      });
+    }
+
+3. Add a <tt>data-deep-link</tt> attribute to links that you want to load using the Ajax framework.  A jQuery live event automatically intercepts all clicks on links with this attribute and loads their content using the framework.
+
+   By default all links that use the Rails link helpers will include this attribute.  When a link with this attribute is clicked, content is requested using AJAX and goes through the Ajax framework.  Rails receives a request for content at the <tt>data-deep-link</tt> location.  The content is rendered using the default layout for the action but from the <tt>app/views/layouts/ajax</tt> directory.  The rendered content is received client-side and special Ajax headers are processed.  The content is then inserted into the specified container, or the <tt>default_container</tt> defined in your Ajax JS class above.
+
+4. To submit forms using the Ajax framework, or to manually request content using various request methods, you can call <tt>window.ajax.loadPage</tt>, passing in options like _url_, _method_ and _data_.
+
+   For example to handle form submissions with Ajax, you could use code like the following:
+
+      $('.radio-search form').live('submit', function(e) {
+        var form = $(e.target);
+        window.ajax.loadPage({
+          url: form.attr('action'),
+          method: 'POST',
+          data: form.serialize()
+        });
+      });
+
+5. Specify a container to receive Ajax content on a per-action, per-controller, per-layout or dynamic basis using the <tt>ajax_header :container, '<jquery css selector>'</tt> helper method.
+
+   For example:
+
+      # app/views/layouts/ajax/two_column.html.haml
+      ajax_header :container, '#twocolumns'
+
+6. Specify tabs that should be activated on a per-action, per-controller or dynamic basis using the <tt>ajax_header :tab, '<jquery css selector>'</tt> helper method.  The element(s) that match the selector will have their _activate_ event triggered, so you will need to setup an event handler.
+
+   For example:
+
+      # app/controllers/pages_controller.rb
+      ajax_header :tab, '#header .nav li:contains(Tour)', :only => :tour
+
+      # public/javascripts/application.js
+      $('#header .nav li').live('activate', function() {
+        $(this).siblings().removeClass('active').end().addClass('active');
+      });
+
+7. Specify paths that should bypass the Ajax framework.  I.e. accessing these paths using a full URL (not a hashed URL), will render the page like in a traditional Rails app.  If that path was not excepted the Ajax framework would have forced a redirect to the hashed version of the URL before rendering the page contents using Ajax.  See <i>Excepted Links</i>.
+
+   For example:
+   
+      # config/initializers/ajax.rb
+      Ajax.exclude_paths %w[ /login /logout /signup ]
 
 == Install
 
@@ -60,25 +122,6 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
   skipped: app/views/ajax/framework.html.erb exists!
   ...
 
-== Getting Started
-
-1. Ajax looks for an alternative layout to use with AJAX requests in <tt>app/views/layouts/ajax/</tt>.  Copy existing layouts into this directory and get them ready for AJAX by removing any HTML HEAD elements, everything but the inner BODY content.
-
-   Your main layout should contain a container element that will receive page content.  Typically this would be the container below the page header.  If you don't have a static header, you can make the whole BODY element the container.
-
-   Here is an {example of converting our <tt>layouts/application.html.haml</tt> to <tt>layouts/ajax/application.html.haml</tt>}[http://gist.github.com/373133/5a80a63ef69a883ed3c5630b68330b1036ad01ec].
-
-2. Instantiate an instance of the Ajax class in <tt>public/javascripts/application.js</tt>.  For example:
-
-  // public/javascripts/application.js
-  if (typeof(Ajax) != 'undefined') {
-    window.ajax = new Ajax({
-      default_container: '#main',  // jQuery selector of your container element
-      enabled: true,               // Enable/disable the plugin
-      lazy_load_assets: false      // YMMV
-    });
-  }
-
 == Introduction
 
 === Features and Support
@@ -107,7 +150,7 @@ Where before you would have seen something like <tt>http://example.com/the-beatl
 
 Ajax comprises Rack middleware, Rails integrations and some JavaScript libraries to handle everything from redirecting and rewriting incoming requests, to managing the response headers and content, to handling the browser URL, JavaScript callbacks and client-side events.
 
-Browsers do not send the hashed part of the the URL with page requests, so to an AJAX-ed application, all requests look like they are for root.
+Browsers do not send the hashed part of the the URL with page requests, so to an Ajax-ed application, all requests look like they are for root.
 
 In order to load the correct page we must first render a framework page with accompanying JavaScript.  The JS examines the URL and then issues another request to the server for the hashed part (which may still be <tt>/</tt> if the user requested the home page).
 
@@ -232,9 +275,9 @@ Our layouts:
 
 == Link Handling
 
-<b>All links which are rendered using the <tt>link_to</tt> (or any other url) helper method automatically include a <tt>data-deep-link</tt> attribute</b> containing the path from the link's HREF.
+<b>All links which are rendered using the <tt>link_to</tt> (or any other url) helper method automatically include a <tt>data-deep-link</tt> attribute</b> containing the path portion of the link's HREF URL.
 
-The Ajax JavaScript class listens for clicks on any link with a <tt>data-deep-link</tt> attribute and loads the link's content using AJAX.
+The Ajax JavaScript class listens for clicks on any link with a <tt>data-deep-link</tt> attribute and loads the link's content using the Ajax framework.
 
 Should you need to, you can set this attribute on a link by passing in HTML options to <tt>link_to</tt>:
 

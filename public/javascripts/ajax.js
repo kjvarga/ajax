@@ -386,6 +386,11 @@ var Ajax = function(options) {
    *  [callback]   Execute a callback after assets have loaded
    *
    *  Cookies in the response are automatically set on the document.cookie.
+   *
+   *  Options:
+   *    url      request url (required)
+   *    method   request method, default GET
+   *    data     request data
    */
   self.loadPage = function(options) {
     if (!self.enabled) {
@@ -415,7 +420,8 @@ var Ajax = function(options) {
     self.current_request = jQuery.ajax({
       cache: false,
       url: safe_url,
-      method: options.method || 'GET',
+      data: options.data,
+      type: options.method ? options.method : 'GET',
       beforeSend: self.setRequestHeaders,
       success: self.responseHandler,
       dataType: 'html',
