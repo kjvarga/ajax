@@ -383,7 +383,7 @@ var Ajax = function(options) {
    *  [tab]        jQuery selector, trigger the 'activate' event on the tab
    *  [container]  The container to receive the content, or <tt>main</tt> by default.
    *  [assets]     Assets to load
-   *  [callback]   Execute a callback after assets have loaded
+   *  [callbacks]  Execute one or more callbacks after assets have loaded
    *
    *  Cookies in the response are automatically set on the document.cookie.
    *
@@ -572,7 +572,7 @@ var Ajax = function(options) {
     //  title    - set page title
     //  tab      - activate a tab
     //  assets   - load assets
-    //  callback - execute a callback
+    //  callbacks - execute one or an array of callbacks
     if (data.title !== undefined) {
       console.log('Using page title '+data.title);
       // commenting this out until we fix ' char bug, removing % chars from page titles for now
@@ -613,7 +613,7 @@ var Ajax = function(options) {
     */
     if (data.callbacks) {
       data.callbacks = jQuery.makeArray(data.callbacks);
-      self.callbacks.concat(data.callbacks);
+      self.callbacks = self.callbacks.concat(data.callbacks);
     }
 
     /**
