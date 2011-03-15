@@ -52,13 +52,21 @@ module Rack
       # The Ajax::Spec::Helpers module includes a helper
       # method to test the result of a rewrite.
       if ::Ajax.is_mocked?
-        rack_response.nil? ? Rack::Ajax::Parser.rack_response(env.to_yaml(:Encoding => :Utf8)) : rack_response
+        rack_response.nil? ? Rack::Ajax::Parser.rack_response(encode_env(env)) : rack_response
       elsif !rack_response.nil?
         rack_response
       else
         # Fallthrough to the app.
         @app.call(env)
       end
+    end
+
+    protected
+
+    # Convert the environment hash to yaml so it can be unserialized later
+    def encode_env(env)
+      env['rack.session'] = env['rack.session'].to_hash if env['rack.session'].is_a?(Hash)
+      env.to_yaml(:Encoding => :Utf8)
     end
   end
 end

@@ -7,7 +7,7 @@ require 'ajax/spec/extension'
 require 'ruby-debug'
 
 # Rails dependencies
-gem 'actionpack', '2.3.5'
+gem 'actionpack', '2.3.11'
 require 'action_controller'
 require 'active_support/core_ext'
 
