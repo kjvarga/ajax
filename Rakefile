@@ -1,8 +1,5 @@
-require 'rake'
-require 'rake/rdoctask'
-require 'rubygems'
-gem 'rspec', '1.3.0'
-require 'spec/rake/spectask'
+require 'bundler/setup'
+Bundler.require
 
 begin
   require 'jeweler'
@@ -25,6 +22,7 @@ end
 desc 'Default: run spec tests.'
 task :default => :spec
 
+require 'spec/rake/spectask'
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'
   spec.spec_files = FileList['spec/ajax/**/*_spec.rb', 'spec/rack-ajax/**/*_spec.rb']
@@ -36,20 +34,7 @@ Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.rcov = true
 end
 
-#task :spec => :check_dependencies
-
-desc 'Generate documentation for the ajax plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Ajax'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README.rdoc')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-  rdoc.rdoc_files.include('app/**/*.rb')
-end
-
 namespace :release do
-
   desc "Release a new patch version"
   task :patch do
     Rake::Task['version:bump:patch'].invoke
