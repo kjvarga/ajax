@@ -24,7 +24,7 @@ module Ajax
       # All Hash and Array values are deep-merged.
       # Hash keys are converted to Strings.
       def set_header(object, key, value)
-        headers = object.is_a?(::ActionController::Response) ? object.headers : object
+        headers = object.is_a?(Hash) ? object : object.headers # ::ActionController::Response
         key = key.to_s
 
         info = case headers["Ajax-Info"]
@@ -61,7 +61,7 @@ module Ajax
       # <tt>object</tt> can be a Hash or instance of <tt>ActionController::Request</tt>
       # <tt>key</tt> Symbol or String hash key, converted to String
       def get_header(object, key)
-        headers = object.is_a?(::ActionController::Request) ? object.headers : object
+        headers = object.is_a?(Hash) ? object : object.headers # ::ActionController::Request
         key = key.to_s
 
         info = case headers["Ajax-Info"]

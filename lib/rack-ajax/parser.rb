@@ -10,7 +10,7 @@ module Rack
       # easier to introspect the headers.
       def initialize(env)
         @env = env
-        @request = ActionController::Request.new(env)
+        @request = Rack::Request.new(env)
       end
 
       protected
@@ -20,7 +20,7 @@ module Rack
       end
 
       def ajax_request?
-        @request.xml_http_request?
+        @request.xhr?
       end
 
       def get_request?

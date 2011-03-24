@@ -1,14 +1,6 @@
 require 'spec_helper'
 require 'fileutils'
 
-# Dummy Rails.root to tmp/
-TMP_DIR = Ajax.root + '../../tmp'
-Rails = Class.new do
-  def self.root
-    TMP_DIR
-  end
-end
-
 def verbose # silence the tasks
   false
 end
@@ -17,13 +9,18 @@ require 'rake'
 load(Ajax.root + 'tasks/ajax_tasks.rake')
 
 context 'task' do
+  before :all do
+    @tmp = Ajax.root + '../../tmp'
+    silence_warnings { Rails = mock(:root => @tmp) }
+  end
+
   before :each do
-    FileUtils.rm_r(TMP_DIR) if File.exists?(TMP_DIR)
-    FileUtils.mkdir(TMP_DIR)
+    FileUtils.rm_r(@tmp) if File.exists?(@tmp)
+    FileUtils.mkdir(@tmp)
   end
 
   it "rails root should be tmp/" do
-    Rails.root.should == TMP_DIR
+    Rails.root.should == @tmp
   end
 
   context 'install' do

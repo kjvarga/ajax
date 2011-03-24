@@ -40,7 +40,14 @@ END
   namespace :install do
     desc "Copy Ajax integration spec tests into spec/integration."
     task :specs do
-      puts "Coming soon..."
+      file = Ajax.app.root + 'spec/integration/ajax-spec.rb'
+      if File.exist?(file)
+        puts "already exists: #{file}" if verbose
+      else
+        FileUtils.mkdir_p(file)
+        FileUtils.cp(file.sub(Ajax.app.root, Ajax.root), file)
+        puts "created: #{file}" if verbose
+      end
     end
   end
 

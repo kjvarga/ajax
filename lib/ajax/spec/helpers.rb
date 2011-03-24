@@ -55,14 +55,14 @@ module Ajax
       # Response must be [code, {headers}, ['Response']]
       # Headers must contain the Content-Type header
       def should_be_a_valid_response
-        return if @response.is_a?(::ActionController::Response)
-        @response.should be_a_kind_of(Array)
+        return if !@response.is_a?(Array) # ::ActionController::Response
+        @response.should be_a(Array)
         @response.size.should == 3
-        @response[0].should be_a_kind_of(Integer)
-        @response[1].should be_a_kind_of(Hash)
+        @response[0].should be_a(Integer)
+        @response[1].should be_a(Hash)
         @response[1]['Content-Type'].should =~ %r[^text\/\w+]
-        @response[2].should be_a_kind_of(Array)
-        @response[2][0].should be_a_kind_of(String)
+        @response[2].should be_a(Array)
+        @response[2][0].should be_a(String)
       end
 
       def env(uri, request_method, options={})
@@ -76,15 +76,15 @@ module Ajax
       end
 
       def response_body
-        @response.is_a?(::ActionController::Response) ? @response.body : @response[2][0]
+        @response.is_a?(Array) ? @response[2][0] : @response.body
       end
 
       def response_code
-        @response.is_a?(::ActionController::Response) ? @response.status.to_i : @response[0]
+        @response.is_a?(Array) ? @response[0] : @response.status.to_i
       end
 
       def response_headers
-        @response.is_a?(::ActionController::Response) ? @response.headers.to_hash : @response[1]
+        @response.is_a?(Array) ? @response[1] : @response.headers.to_hash
       end
 
       def response_body_as_hash

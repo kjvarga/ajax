@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'ajax/spec/helpers'
 require 'uri'
+require 'rack-ajax'
 
 include Ajax::Spec::Helpers
 

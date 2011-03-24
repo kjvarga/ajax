@@ -1,4 +1,1 @@
-require 'ajax'
-require 'rack-ajax'
-
-Ajax.install_for_rails
+Kernel.load File.expand_path('../../init.rb', __FILE__)

@@ -10,10 +10,11 @@ begin
     gem.email = "kjvarga@gmail.com"
     gem.homepage = "http://github.com/kjvarga/ajax"
     gem.authors = ["Karl Varga"]
-    gem.files =  FileList["[A-Z]*", "{app,config,lib,public,rails,spec,tasks}/**/*"]
+    gem.files =  FileList["[A-Z]*", "init.rb", "{app,config,lib,public,rails,spec,tasks}/**/*"]
     gem.test_files = []
     gem.add_development_dependency "rspec"
     gem.add_dependency "json"
+    gem.add_dependency "rack"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

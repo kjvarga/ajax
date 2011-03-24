@@ -1,11 +1,13 @@
 require 'ajax/helpers'
-require 'ajax/railtie' if defined?(Rails) && Rails.version.to_f >= 3
+require 'ajax/application'
 require 'pathname'
+# require railties at the end
 
 module Ajax
   include Ajax::Helpers
 
   class << self
+    attr_accessor :app
     attr_writer :logger, :framework_path
   end
 
@@ -90,29 +92,11 @@ module Ajax
     @mocked = !!value
   end
 
-  # Installs Ajax for Rails.
-  #
-  # This method is called by <tt>init.rb</tt>, which is run by Rails on startup.
-  #
-  # Customize rendering.  Include custom headers and don't render the layout for AJAX.
-  # Insert the Rack::Ajax middleware to rewrite and handle requests.
-  # Add custom attributes to outgoing links.
-  def self.install_for_rails
-    if defined?(Rails)
-      Ajax.logger = Rails.logger
-
-      # Customize rendering.  Include custom headers and don't render the layout for AJAX.
-      ::ActionController::Base.send(:include, Ajax::ActionController)
-
-      # Insert the Rack::Ajax middleware to rewrite and handle requests
-      ::ActionController::Dispatcher.middleware.insert_before(Rack::Head, Rack::Ajax)
-
-      # Add custom attributes to outgoing links
-      ::ActionView::Base.send(:include, Ajax::ActionView)
-    end
-  end
-
   def self.version
     @version ||= File.read(File.join(File.dirname(__FILE__), '..', 'VERSION')).strip
   end
+
+  self.app = Ajax::Application.new
 end
+
+require 'ajax/railtie' if Ajax.app.rails?(3)
