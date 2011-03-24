@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'fileutils'
 
 # Dummy Rails.root to tmp/
-TMP_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'tmp'))
+TMP_DIR = Ajax.root + '../../tmp'
 Rails = Class.new do
   def self.root
     TMP_DIR
@@ -14,7 +14,7 @@ def verbose # silence the tasks
 end
 
 require 'rake'
-load(File.join(Ajax.root, 'tasks', 'ajax_tasks.rake'))
+load(Ajax.root + 'tasks/ajax_tasks.rake')
 
 context 'task' do
   before :each do

@@ -1,5 +1,6 @@
 require 'ajax/helpers'
 require 'ajax/railtie' if defined?(Rails) && Rails.version.to_f >= 3
+require 'pathname'
 
 module Ajax
   include Ajax::Helpers
@@ -10,7 +11,7 @@ module Ajax
 
   # Return the full path to the root of the Ajax plugin/gem directory.
   def self.root
-    @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
+    @root ||= Pathname.new(File.expand_path('../../', __FILE__))
   end
 
   # Return a logger instance.

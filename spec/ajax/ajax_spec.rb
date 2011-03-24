@@ -14,7 +14,7 @@ context Ajax do
   end
 
   it "should have a root method" do
-    Ajax.root.should == File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
+    Ajax.root.should == Pathname.new(File.expand_path('../../../', __FILE__))
   end
   
   it "should tell you the version" do
