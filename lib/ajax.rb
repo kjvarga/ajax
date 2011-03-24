@@ -1,4 +1,5 @@
 require 'ajax/helpers'
+require 'ajax/railtie' if defined?(Rails) && Rails.version.to_f >= 3
 
 module Ajax
   include Ajax::Helpers
