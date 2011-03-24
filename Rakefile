@@ -13,6 +13,7 @@ begin
     gem.files =  FileList["[A-Z]*", "{app,config,lib,public,rails,spec,tasks}/**/*"]
     gem.test_files = []
     gem.add_development_dependency "rspec"
+    gem.add_dependency "json"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
