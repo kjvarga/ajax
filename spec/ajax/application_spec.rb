@@ -24,4 +24,11 @@ describe Ajax::Application do
       end
     end
   end
+
+  context "root" do
+    it "should be set to the Rails root" do
+      silence_warnings { Rails = mock(:root => Ajax.root) }
+      Ajax.app.root.should == Rails.root
+    end
+  end
 end

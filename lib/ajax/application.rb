@@ -25,6 +25,10 @@ module Ajax
       end)
     end
 
+    def root
+      Pathname.new(rails? && Rails.root || Dir.getwd)
+    end
+
     # Include framework hooks for Rails
     #
     # This method is called by <tt>init.rb</tt>, which is run by Rails on startup.
