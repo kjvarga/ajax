@@ -6,8 +6,8 @@ module Ajax
         app/views/ajax/framework.html.erb
         config/initializers/ajax.rb
         public/javascripts/ajax.js
-        public/javascripts/jquery.address-1.2rc.js
-        public/javascripts/jquery.address-1.2rc.min.js
+        public/javascripts/jquery.address-1.3.js
+        public/javascripts/jquery.address-1.3.min.js
         public/javascripts/jquery.json-2.2.min.js
         public/images/ajax-loading.gif]
 
