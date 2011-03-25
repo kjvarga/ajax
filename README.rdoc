@@ -8,6 +8,66 @@ The beauty of Ajax is that your Rails application only ever sees traditional req
 
 As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kazaa.com].  Try it out and create some wicked playlists while you're at it!
 
+== Changelog
+
+* v1.0.9: Rails 3.0.5 compatibility
+
+== Install
+
+=== Rails 3
+
+1. Add the gem to your <tt>Gemspec</tt>
+
+     gem 'ajax'
+
+2. <tt>bundle</tt>
+3. <tt>rake ajax:install</tt>
+
+=== Rails 2
+
+<b> As a Gem</b>
+
+1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
+
+     config.gem 'ajax'
+
+2. <tt>rake gems:install</tt>
+
+3. Add to your <tt>Rakefile</tt>
+
+     begin
+       require 'ajax/tasks'
+     rescue Exception => e
+       puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
+     end
+
+4. <tt>rake ajax:install</tt> to install required files.  This command is safe to run multiple times.  It will skip existing files.
+
+4. Add a route for the framework path to your <tt>config/routes.rb</tt>
+
+    ActionController::Routing::Routes.draw do |map|
+      Ajax::Routes.draw(map)
+    end
+
+<b> As a Plugin</b>
+
+  ./script/plugin install http://github.com/kjvarga/ajax.git
+
+=== Sample Output
+
+  $ rake ajax:install
+  created: app/controllers/ajax_controller.rb
+  created: app/views/ajax/framework.html.erb
+  created: config/initializers/ajax.rb
+  created: public/javascripts/ajax.js
+  created: public/javascripts/jquery.address-1.3.js
+  created: public/javascripts/jquery.address-1.3.min.js
+  created: public/javascripts/jquery.json-2.2.min.js
+  created: public/images/ajax-loading.gif
+
+  $ rake ajax:install:specs
+  already exists: spec/integration/ajax_spec.rb
+
 == Getting Started
 
 1. Ajax looks for a layout to use for an Ajax request in <tt>app/views/layouts/ajax/</tt>.  It looks for a layout with the same name as the default Rails layout for that action.  So copy your existing layouts into <tt>layouts/ajax/</tt> and get them ready for Ajax by removing any excess HTML, leaving just the content that will be inserted into the container.
@@ -66,61 +126,9 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 7. Specify paths that should bypass the Ajax framework.  I.e. accessing these paths using a full URL (not a hashed URL), will render the page like in a traditional Rails app.  If that path was not excepted the Ajax framework would have forced a redirect to the hashed version of the URL before rendering the page contents using Ajax.  See <i>Excepted Links</i>.
 
    For example:
-   
+
       # config/initializers/ajax.rb
       Ajax.exclude_paths %w[ /login /logout /signup ]
-
-== Install
-
-=== Rails 3 (untested)
-
-1. Add the gem to your <tt>Gemspec</tt>
-
-     gem 'ajax'
-
-2. <tt>bundle install</tt>
-3. <tt>rake ajax:install</tt>
-
-=== Rails 2.x.x
-
-<b> As a Gem</b>
-
-1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
-
-     config.gem 'ajax'
-
-2. <tt>rake gems:install</tt>
-
-3. Add to your <tt>Rakefile</tt>
-
-     begin
-       require 'ajax/tasks'
-     rescue Exception => e
-       puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
-     end
-
-4. <tt>rake ajax:install</tt> to install required files.  This command is safe to run multiple times.  It will skip existing files.
-
-<b> As a Plugin</b>
-
-  ./script/plugin install http://github.com/kjvarga/ajax.git
-
-=== Sample Output
-
-  $ rake ajax:install
-  created: app/controllers/ajax_controller.rb
-  created: app/views/ajax/framework.html.erb
-  created: config/initializers/ajax.rb
-  created: public/javascripts/ajax.js
-  created: public/javascripts/jquery.address-1.2rc.js
-  created: public/javascripts/jquery.address-1.2rc.min.js
-  created: public/javascripts/jquery.json-2.2.min.js
-  created: public/images/ajax-loading.gif
-
-  $ rake ajax:install
-  skipped: app/controllers/ajax_controller.rb exists!
-  skipped: app/views/ajax/framework.html.erb exists!
-  ...
 
 == Introduction
 
@@ -192,24 +200,25 @@ You must be running <b>jQuery 1.4.2</b> to use this plugin.  Sorry, Prototype us
 
 The following JavaScript libraries are required and included in the plugin:
 
-* {jQuery Address 1.2RC}[http://www.asual.com/jquery/address/]
+* {jQuery Address 1.3}[http://www.asual.com/jquery/address/]
 * jQuery JSON 2.2
 
 === Ruby and Rails:
 
-  * Rails 2.3.4 running Ruby 1.8.7 and Ruby 1.9
-  * Rails 2.3.5 running Ruby 1.8.7 and Ruby 1.9
+* Rails 3.0.5 running Ruby 1.8.7 and Ruby 1.9
+* Rails 2.3.4 running Ruby 1.8.7 and Ruby 1.9
+* Rails 2.3.5 running Ruby 1.8.7 and Ruby 1.9
 
 === Browsers:
 
 (See {jQuery address supported browsers}[http://www.asual.com/jquery/address/docs/].)
 
-  * Internet Explorer 6.0+
-  * Mozilla Firefox 1.0+
-  * Safari 1.3+
-  * Opera 9.5+
-  * Chrome 1.0+
-  * Camino 1.0+
+* Internet Explorer 6.0+
+* Mozilla Firefox 1.0+
+* Safari 1.3+
+* Opera 9.5+
+* Chrome 1.0+
+* Camino 1.0+
 
 = Documentation
 
