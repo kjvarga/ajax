@@ -23,5 +23,9 @@ module Ajax
     initializer 'ajax.routes' do |app|
       app.routes_reloader.paths << Ajax.root + 'rails/routes.rb'
     end
+
+    initializer 'ajax.logger' do |app|
+      Ajax.logger = ::Rails.logger
+    end
   end
 end

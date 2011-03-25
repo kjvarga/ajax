@@ -8,7 +8,8 @@ namespace :ajax do
     INSTALL_FILES.map do |file|
       show_result(file) { |file| copy_unless_exists(file) }
     end
-    puts <<-END
+    if verbose
+      puts <<-END
 \nWelcome to Ajax!
 
 1. Ajax looks for an alternative layout to use with AJAX requests in
@@ -35,6 +36,7 @@ example:
     });
   }
 END
+    end
   end
 
   namespace :install do
