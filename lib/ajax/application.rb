@@ -39,12 +39,15 @@ module Ajax
     #
     # Hooks for Rails 3 are installed using Railties.
     def init
-      if !@inititalized && rails?
+      if rails?
         Ajax.logger = ::Rails.logger
 
         if rails?(3)
           require 'ajax/railtie'
         else
+          require 'ajax/action_controller'
+          require 'ajax/action_view'
+
           # Customize rendering.  Include custom headers and don't render the layout for AJAX.
           ::ActionController::Base.send(:include, Ajax::ActionController)
 
@@ -55,7 +58,6 @@ module Ajax
           ::ActionView::Base.send(:include, Ajax::ActionView)
         end
       end
-      @inititalized ||= true
     end
   end
 end
