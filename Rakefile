@@ -10,7 +10,7 @@ begin
     gem.email = "kjvarga@gmail.com"
     gem.homepage = "http://github.com/kjvarga/ajax"
     gem.authors = ["Karl Varga"]
-    gem.files =  FileList["[A-Z]*", "init.rb", "{app,config,lib,public,rails,spec,tasks}/**/*"]
+    gem.files =  FileList["[A-Z]*", "init.rb", "{app,config,lib,public,rails,tasks}/**/*"] - FileList['spec/rails*/**/*']
     gem.test_files = []
     gem.add_development_dependency "rspec"
     gem.add_dependency "json"

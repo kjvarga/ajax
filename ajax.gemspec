@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga"]
-  s.date = %q{2011-03-24}
+  s.date = %q{2011-03-25}
   s.description = %q{Augment a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users, such as testing, SEO and browser history.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
@@ -46,73 +46,13 @@ Gem::Specification.new do |s|
      "lib/rack-ajax/parser.rb",
      "public/images/ajax-loading.gif",
      "public/javascripts/ajax.js",
-     "public/javascripts/jquery.address-1.1.js",
-     "public/javascripts/jquery.address-1.1.min.js",
-     "public/javascripts/jquery.address-1.2.js",
-     "public/javascripts/jquery.address-1.2.min.js",
-     "public/javascripts/jquery.address-1.2rc.js",
-     "public/javascripts/jquery.address-1.2rc.min.js",
+     "public/javascripts/jquery.address-1.3.js",
+     "public/javascripts/jquery.address-1.3.min.js",
      "public/javascripts/jquery.json-2.2.js",
      "public/javascripts/jquery.json-2.2.min.js",
      "rails/init.rb",
      "rails/install.rb",
-     "spec/ajax/ajax_spec.rb",
-     "spec/ajax/application_spec.rb",
-     "spec/ajax/helpers_spec.rb",
-     "spec/ajax/request_helper_spec.rb",
-     "spec/ajax/tasks_spec.rb",
-     "spec/integration/ajax_spec.rb",
-     "spec/rack-ajax/parser_spec.rb",
-     "spec/rails3.0.4/Gemfile",
-     "spec/rails3.0.4/Gemfile.lock",
-     "spec/rails3.0.4/README",
-     "spec/rails3.0.4/Rakefile",
-     "spec/rails3.0.4/app/controllers/application_controller.rb",
-     "spec/rails3.0.4/app/helpers/application_helper.rb",
-     "spec/rails3.0.4/app/views/layouts/application.html.erb",
-     "spec/rails3.0.4/config.ru",
-     "spec/rails3.0.4/config/application.rb",
-     "spec/rails3.0.4/config/boot.rb",
-     "spec/rails3.0.4/config/database.yml",
-     "spec/rails3.0.4/config/environment.rb",
-     "spec/rails3.0.4/config/environments/development.rb",
-     "spec/rails3.0.4/config/environments/production.rb",
-     "spec/rails3.0.4/config/environments/test.rb",
-     "spec/rails3.0.4/config/initializers/backtrace_silencers.rb",
-     "spec/rails3.0.4/config/initializers/inflections.rb",
-     "spec/rails3.0.4/config/initializers/mime_types.rb",
-     "spec/rails3.0.4/config/initializers/secret_token.rb",
-     "spec/rails3.0.4/config/initializers/session_store.rb",
-     "spec/rails3.0.4/config/locales/en.yml",
-     "spec/rails3.0.4/config/routes.rb",
-     "spec/rails3.0.4/db/development.sqlite3",
-     "spec/rails3.0.4/db/seeds.rb",
-     "spec/rails3.0.4/doc/README_FOR_APP",
-     "spec/rails3.0.4/log/development.log",
-     "spec/rails3.0.4/log/production.log",
-     "spec/rails3.0.4/log/server.log",
-     "spec/rails3.0.4/log/test.log",
-     "spec/rails3.0.4/public/404.html",
-     "spec/rails3.0.4/public/422.html",
-     "spec/rails3.0.4/public/500.html",
-     "spec/rails3.0.4/public/favicon.ico",
-     "spec/rails3.0.4/public/images/rails.png",
-     "spec/rails3.0.4/public/javascripts/application.js",
-     "spec/rails3.0.4/public/javascripts/controls.js",
-     "spec/rails3.0.4/public/javascripts/dragdrop.js",
-     "spec/rails3.0.4/public/javascripts/effects.js",
-     "spec/rails3.0.4/public/javascripts/prototype.js",
-     "spec/rails3.0.4/public/javascripts/rails.js",
-     "spec/rails3.0.4/public/robots.txt",
-     "spec/rails3.0.4/script/rails",
-     "spec/rails3.0.4/test/performance/browsing_test.rb",
-     "spec/rails3.0.4/test/test_helper.rb",
-     "spec/rails3.0.4/tmp/pids/server.pid",
-     "spec/spec.opts",
-     "spec/spec_helper.rb",
-     "spec/support/file_macros.rb",
-     "spec/support/query_count.rb",
-     "spec/support/response_helpers.rb",
+     "rails/routes.rb",
      "tasks/ajax_tasks.rake"
   ]
   s.homepage = %q{http://github.com/kjvarga/ajax}
@@ -127,13 +67,16 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_runtime_dependency(%q<json>, [">= 0"])
+      s.add_runtime_dependency(%q<rack>, [">= 0"])
     else
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<json>, [">= 0"])
+      s.add_dependency(%q<rack>, [">= 0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<json>, [">= 0"])
+    s.add_dependency(%q<rack>, [">= 0"])
   end
 end
 

@@ -3,6 +3,7 @@ PATH
   specs:
     ajax (1.0.8)
       json
+      rack
 
 GEM
   remote: http://rubygems.org/
