@@ -1,6 +1,9 @@
 module Ajax
   module RSpec
     module Extension
+      def included(base)
+        require 'ajax/rspec/integration'
+      end
 
       def integrate_ajax
         Ajax.enabled = true
@@ -20,15 +23,5 @@ module Ajax
         Ajax.mocked = false
       end
     end
-  end
-end
-
-module ActiveSupport
-  class TestCase
-    include Ajax::RSpec::Extension
-
-    before(:all) do
-      ::Ajax.enabled = false
-    end if method_defined?(:before)
   end
 end
