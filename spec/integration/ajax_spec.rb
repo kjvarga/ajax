@@ -10,7 +10,7 @@ include Ajax::RSpec::Helpers
 # Test Rack middleware using integration tests because the Spec controller tests
 # do not invoke Rack.
 describe 'Rack::Ajax' do
-  before :all do
+  before :each do
     mock_ajax      # Force a return from Rack::Ajax
   end
 
@@ -62,31 +62,27 @@ describe 'Rack::Ajax' do
   end
 
   describe "robot" do
-    before :each do
-      @user = login_robot_user
-    end
-
     it "should not modify request for root" do
-      get('/')
+      get('/', nil, 'HTTP_USER_AGENT' => "Googlebot")
       should_not_modify_request
     end
 
     it "should not modify traditional requests" do
-      get('/Beyonce')
+      get('/Beyonce', nil, 'HTTP_USER_AGENT' => "Googlebot")
       should_not_modify_request
     end
 
     describe "request hashed" do
       describe "non-root url" do
         it "should not modify the request" do
-          get('/Akon/?query1#/Beyonce?query2')
+          get('/Akon/?query1#/Beyonce?query2', nil, 'HTTP_USER_AGENT' => "Googlebot")
           should_not_modify_request
         end
       end
 
       describe "root url" do
         it "should rewrite to traditional url" do
-          get('/#/Beyonce?query2')
+          get('/#/Beyonce?query2', nil, 'HTTP_USER_AGENT' => "Googlebot")
           should_rewrite_to('/Beyonce?query2')
         end
       end
