@@ -2,13 +2,13 @@ require 'bundler/setup'
 Bundler.require
 
 require 'spec/autorun'
-require 'ajax/spec/extension'
+require 'ajax/rspec'
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
 Spec::Runner.configure do |config|
-  include Ajax::Spec::Extension
+  include Ajax::RSpec::Extension
   config.include(FileMacros)
 end

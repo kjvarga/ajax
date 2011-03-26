@@ -5,7 +5,7 @@ require 'ajax/spec/helpers'
 require 'uri'
 require 'rack-ajax'
 
-include Ajax::Spec::Helpers
+include Ajax::RSpec::Helpers
 
 # Test the Rack::Ajax::Parser.  See <tt>lib/rack-ajax-parser.rb</tt>
 #

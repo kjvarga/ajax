@@ -1,15 +1,15 @@
 require 'spec_helper'
 require 'uri'
-require 'ajax/spec/helpers'
+require 'ajax/rspec'
 
-include Ajax::Spec::Helpers
+include Ajax::RSpec::Helpers
 
 # Test the Rack::Ajax handling of urls according to our block from
 # <tt>config/initializers/ajax.rb</tt>
 #
 # Test Rack middleware using integration tests because the Spec controller tests
 # do not invoke Rack.
-context 'Rack::Ajax' do
+describe 'Rack::Ajax' do
   before :all do
     mock_ajax      # Force a return from Rack::Ajax
   end
@@ -18,8 +18,8 @@ context 'Rack::Ajax' do
     unmock_ajax
   end
 
-  context "XMLHttpRequest" do
-    context "hashed url" do
+  describe "XMLHttpRequest" do
+    describe "hashed url" do
       it "should rewrite GET request" do
         xhr(:get, '/?query1#/Beyonce?query2')
         should_rewrite_to('/Beyonce?query2')
@@ -31,7 +31,7 @@ context 'Rack::Ajax' do
       end
     end
 
-    context "traditional url" do
+    describe "traditional url" do
       it "should not be modified" do
         xhr(:get, '/Beyonce')
         should_not_modify_request
@@ -44,7 +44,7 @@ context 'Rack::Ajax' do
     end
   end
 
-  context "request for root url" do
+  describe "request for root url" do
     it "should not be modified" do
       get('/')
       should_not_modify_request
@@ -61,7 +61,7 @@ context 'Rack::Ajax' do
     end
   end
 
-  context "robot" do
+  describe "robot" do
     before :each do
       @user = login_robot_user
     end
@@ -76,15 +76,15 @@ context 'Rack::Ajax' do
       should_not_modify_request
     end
 
-    context "request hashed" do
-      context "non-root url" do
+    describe "request hashed" do
+      describe "non-root url" do
         it "should not modify the request" do
           get('/Akon/?query1#/Beyonce?query2')
           should_not_modify_request
         end
       end
 
-      context "root url" do
+      describe "root url" do
         it "should rewrite to traditional url" do
           get('/#/Beyonce?query2')
           should_rewrite_to('/Beyonce?query2')
@@ -93,7 +93,7 @@ context 'Rack::Ajax' do
     end
   end
 
-  context "regular user" do
+  describe "regular user" do
     it "should not modify request for root" do
       get('/')
       should_not_modify_request
@@ -104,15 +104,15 @@ context 'Rack::Ajax' do
       should_rewrite_to('/Beyonce?query2')
     end
 
-    context "request hashed" do
-      context "non-root url" do
+    describe "request hashed" do
+      describe "non-root url" do
         it "should redirect to hashed part at root" do
           get('/Akon/?query1#/Beyonce?query2')
           should_redirect_to('/#/Beyonce?query2')
         end
       end
 
-      context "root url" do
+      describe "root url" do
         it "should rewrite to traditional url" do
           get('/#/Beyonce?query2')
           should_rewrite_to('/Beyonce?query2')
@@ -120,7 +120,7 @@ context 'Rack::Ajax' do
       end
     end
 
-    context "request traditional url" do
+    describe "request traditional url" do
       it "should not be modified" do
         get('/')
         should_not_modify_request

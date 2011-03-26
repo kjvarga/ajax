@@ -1,7 +1,7 @@
 require 'uri'
 
 module Ajax
-  module Spec
+  module RSpec
     module Helpers
 
       def create_app

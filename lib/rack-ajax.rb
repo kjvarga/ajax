@@ -49,7 +49,7 @@ module Rack
       # To test rewrites, return a 200 response with
       # the modified request environment encoded as Yaml.
       #
-      # The Ajax::Spec::Helpers module includes a helper
+      # The Ajax::RSpec::Helpers module includes a helper
       # method to test the result of a rewrite.
       if ::Ajax.is_mocked?
         rack_response.nil? ? Rack::Ajax::Parser.rack_response(encode_env(env)) : rack_response

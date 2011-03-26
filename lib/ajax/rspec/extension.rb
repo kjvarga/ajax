@@ -1,5 +1,5 @@
 module Ajax
-  module Spec
+  module RSpec
     module Extension
 
       def integrate_ajax
@@ -25,7 +25,7 @@ end
 
 module ActiveSupport
   class TestCase
-    include Ajax::Spec::Extension
+    include Ajax::RSpec::Extension
 
     before(:all) do
       ::Ajax.enabled = false
