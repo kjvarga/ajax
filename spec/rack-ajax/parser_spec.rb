@@ -1,7 +1,7 @@
 # Test Rack middleware using integration tests because the Spec controller tests
 # do not invoke Rack.
 require 'spec_helper'
-require 'ajax/spec/helpers'
+require 'ajax/rspec/helpers'
 require 'uri'
 require 'rack-ajax'
 

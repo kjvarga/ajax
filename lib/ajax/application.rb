@@ -39,24 +39,23 @@ module Ajax
     #
     # Hooks for Rails 3 are installed using Railties.
     def init
-      if rails?
+      return unless rails?
+      if rails?(3)
+        require 'ajax/railtie'
+      else
+        require 'ajax/action_controller'
+        require 'ajax/action_view'
+
         Ajax.logger = ::Rails.logger
+        
+        # Customize rendering.  Include custom headers and don't render the layout for AJAX.
+        ::ActionController::Base.send(:include, Ajax::ActionController)
 
-        if rails?(3)
-          require 'ajax/railtie'
-        else
-          require 'ajax/action_controller'
-          require 'ajax/action_view'
+        # Insert the Rack::Ajax middleware to rewrite and handle requests
+        ::ActionController::Dispatcher.middleware.insert_before(Rack::Head, Rack::Ajax)
 
-          # Customize rendering.  Include custom headers and don't render the layout for AJAX.
-          ::ActionController::Base.send(:include, Ajax::ActionController)
-
-          # Insert the Rack::Ajax middleware to rewrite and handle requests
-          ::ActionController::Dispatcher.middleware.insert_before(Rack::Head, Rack::Ajax)
-
-          # Add custom attributes to outgoing links
-          ::ActionView::Base.send(:include, Ajax::ActionView)
-        end
+        # Add custom attributes to outgoing links
+        ::ActionView::Base.send(:include, Ajax::ActionView)
       end
     end
   end

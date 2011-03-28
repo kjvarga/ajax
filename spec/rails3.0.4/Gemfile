@@ -1,0 +1,8 @@
+source 'http://rubygems.org'
+
+gem 'rails', '3.0.4'
+gem 'ajax', :path => '../../'
+gem 'sqlite3'
+gem 'ruby-debug', '=0.10.3'
+gem 'ruby-debug-base', '=0.10.3'
+gem 'rspec-rails', '~>2.5'

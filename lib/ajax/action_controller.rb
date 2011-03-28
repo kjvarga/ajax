@@ -3,11 +3,8 @@ module Ajax
     def self.included(klass)
       klass.class_eval do
         include ClassMethods
-
         alias_method_chain :render, :ajax
-        alias_method_chain :redirect_to_full_url, :ajax
-
-        append_after_filter :process_response_headers
+        after_filter :serialize_ajax_info
       end
       klass.extend(ClassMethods)
     end
@@ -48,11 +45,20 @@ module Ajax
 
     protected
 
+      if Ajax.app.rails?(3)
+        # Rails 3 hook.  Rails < 3 is handled using redirect_to_full_url.  See
+        # those docs for info.
+        def redirect_to(url={}, status={})
+          super
+          self.location = nil if _ajax_redirect(url, status) # clear any location set by super
+        end
+      end
+
       # Redirect to hashed URLs unless the path is excepted.
       #
       # Store the URL that we are redirecting to in the session.
       # If we then have a request for the root URL we know
-      # to render this URL into it.
+      # to render this URL instead.
       #
       # If redirecting back to the referer, use the referer
       # in the Ajax-Info header because it includes the
@@ -61,9 +67,17 @@ module Ajax
       #
       # For AJAX requests, respond with an AJAX-suitable
       # redirect.
-      def redirect_to_full_url_with_ajax(url, status)
-        return redirect_to_full_url_without_ajax(url, status) unless Ajax.is_enabled?
-        raise DoubleRenderError if performed?
+      #
+      # This method only applies to Rails < 3
+      def redirect_to_full_url(url, status)
+        super unless _ajax_redirect(url, status) # Only call super if we didn't handle it
+      end
+
+      # Perform special processing on the response if we need to.
+      # Return true if an Ajax "redirect" was performed, and false
+      # otherwise.
+      def _ajax_redirect(url, status)
+        return false unless Ajax.is_enabled?
 
         special_redirect = false
         original_url = url
@@ -103,7 +117,26 @@ module Ajax
         if special_redirect
           session[:redirected_to] = nil
           Ajax.logger.info("[ajax] returning special redirect JS")
-          render :partial => '/ajax/redirect_with_fragment', :locals => { :url => url }
+          self.response_body = <<END
+<script type="text/javascript">
+  var url = #{url.to_json};
+  var hash = document.location.hash;
+
+  // Remove leading # from the fragment
+  if (hash.charAt(0) == '#') {
+    hash = hash.substr(1);
+  }
+
+  // Remove leading / from the fragment if the URL already ends in a /
+  // This prevents double-slashes.  Note we can't just replace all
+  // double-slashes because the protocol includes //.
+  if (url.charAt(url.length - 1) == '/' && hash.charAt(0) == '/') {
+    hash = hash.substr(1);
+  }
+
+  document.location.href = url + hash;
+</script>
+END
         else
           session[:redirected_to] = url
           if request.xhr? && Ajax.is_hashed_url?(url)
@@ -111,20 +144,23 @@ module Ajax
             redirect_path = URI.parse(url).select(:fragment).first
             Ajax.logger.info("[ajax] redirect path is #{redirect_path}")
             Ajax.set_header(response, :soft_redirect, redirect_path)
-            render :text => <<-END
-              <script type="text/javascript">
-                window.location.href = #{url.to_json};
-              </script>
-            END
+            self.response_body = <<END
+<script type="text/javascript">
+  window.location.href = #{url.to_json};
+</script>
+END
           else
             Ajax.logger.info("[ajax] not detecting we are xhr. Hard redirect!")
-            redirect_to_full_url_without_ajax(url, status)
+            return false
           end
         end
+        true
       end
 
       # Convert the Ajax-Info hash to JSON before the request is sent.
-      def process_response_headers
+      # Invoked as an after filter.
+      def serialize_ajax_info
+        debugger
         case response.headers['Ajax-Info']
         when Hash
           response.headers['Ajax-Info'] = response.headers['Ajax-Info'].to_json
@@ -160,9 +196,9 @@ module Ajax
             options = extra_options
           end
 
-          default = pick_layout(options)
+          default = Ajax.app.rails?(3) ? XXX : pick_layout(options)
           default = default.path_without_format_and_extension unless default.nil?
-          ajax_layout = layout_for_ajax(default)
+          ajax_layout = _layout_for_ajax(default)
           ajax_layout = ajax_layout.path_without_format_and_extension unless ajax_layout.nil?
           options[:layout] = ajax_layout unless ajax_layout.nil?
 
@@ -181,7 +217,7 @@ module Ajax
       #
       # FIXME: Use hard-coded html layout extension because <tt>default_template_format</tt>
       # is sometimes :js which means the layout isn't found.
-      def layout_for_ajax(default) #:nodoc:
+      def _layout_for_ajax(default) #:nodoc:
         ajax_layout = self.class.read_inheritable_attribute(:ajax_layout)
         if ajax_layout.nil? || !(ajax_layout =~ /^layouts\/ajax/)
           find_layout("layouts/ajax/#{default.sub(/layouts(\/)?/, '')}", 'html') unless default.nil?

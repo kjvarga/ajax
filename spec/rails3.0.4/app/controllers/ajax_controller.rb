@@ -1,12 +1,12 @@
 class AjaxController < ApplicationController
   after_filter :clear_return_to
-
+  ajax_header :callbacks, 'alert("booya");'
   def framework
     render
   end
-  
+
   private
-  
+
   # Don't return to the framework path, return to root
   def clear_return_to
     return unless Ajax.is_enabled?
