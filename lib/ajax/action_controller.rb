@@ -2,14 +2,14 @@ module Ajax
   module ActionController
     def self.included(klass)
       klass.class_eval do
-        include ClassMethods
-        alias_method_chain :render, :ajax
+        extend MirrorMethods
+        include MirrorMethods
         after_filter :serialize_ajax_info
+        include InstanceMethods
       end
-      klass.extend(ClassMethods)
     end
 
-    module ClassMethods
+    module MirrorMethods
 
       # Set a custom response header if the request is AJAX.
       #
@@ -43,7 +43,8 @@ module Ajax
       end
     end
 
-    protected
+    module InstanceMethods
+      protected
 
       if Ajax.app.rails?(3)
         # Rails 3 hook.  Rails < 3 is handled using redirect_to_full_url.  See
@@ -160,7 +161,6 @@ END
       # Convert the Ajax-Info hash to JSON before the request is sent.
       # Invoked as an after filter.
       def serialize_ajax_info
-        debugger
         case response.headers['Ajax-Info']
         when Hash
           response.headers['Ajax-Info'] = response.headers['Ajax-Info'].to_json
@@ -170,63 +170,82 @@ END
       #
       # Intercept rendering to customize the headers and layout handling
       #
-      def render_with_ajax(options = nil, extra_options = {}, &block)
-        return render_without_ajax(options, extra_options, &block) unless Ajax.is_enabled?
+      if !Ajax.app.rails?(3)
+        def render(options = nil, extra_options = {}, &block)
+          return super unless Ajax.is_enabled?
 
-        original_args = [options, extra_options]
-        if request.xhr?
+          original_args = [options, extra_options]
+          if request.xhr?
 
-          # Options processing taken from ActionController::Base#render
-          if options.nil?
-            options = { :template => default_template, :layout => true }
-          elsif options == :update
-            options = extra_options.merge({ :update => true })
-          elsif options.is_a?(String) || options.is_a?(Symbol)
-            case options.to_s.index('/')
-            when 0
-              extra_options[:file] = options
-            when nil
-              extra_options[:action] = options
-            else
-              extra_options[:template] = options
+            # Options processing taken from ActionController::Base#render
+            if options.nil?
+              options = { :template => default_template, :layout => true }
+            elsif options == :update
+              options = extra_options.merge({ :update => true })
+            elsif options.is_a?(String) || options.is_a?(Symbol)
+              case options.to_s.index('/')
+              when 0
+                extra_options[:file] = options
+              when nil
+                extra_options[:action] = options
+              else
+                extra_options[:template] = options
+              end
+              options = extra_options
+            elsif !options.is_a?(Hash)
+              extra_options[:partial] = options
+              options = extra_options
             end
-            options = extra_options
-          elsif !options.is_a?(Hash)
-            extra_options[:partial] = options
-            options = extra_options
+
+            default = pick_layout(options)
+            default = default.path_without_format_and_extension unless default.nil?
+            ajax_layout = _layout_for_ajax(default)
+            ajax_layout = ajax_layout.path_without_format_and_extension unless ajax_layout.nil?
+            options[:layout] = ajax_layout unless ajax_layout.nil?
+
+            # Send the current layout and controller in a custom response header
+            Ajax.set_header(response, :layout, ajax_layout)
+            Ajax.set_header(response, :controller, self.class.controller_name)
+          end
+          super(options, extra_options, &block)
+        end
+      else
+        def render_to_body(options = {})
+          return super if !request.xhr? || !Ajax.is_enabled?
+          _process_options(options)
+
+          if ajax_layout = _layout_for_ajax(options[:layout])
+            options[:layout] = ajax_layout.virtual_path
           end
 
-          default = Ajax.app.rails?(3) ? XXX : pick_layout(options)
-          default = default.path_without_format_and_extension unless default.nil?
-          ajax_layout = _layout_for_ajax(default)
-          ajax_layout = ajax_layout.path_without_format_and_extension unless ajax_layout.nil?
-          options[:layout] = ajax_layout unless ajax_layout.nil?
-
           # Send the current layout and controller in a custom response header
-          Ajax.set_header(response, :layout, ajax_layout)
+          Ajax.set_header(response, :layout, options[:layout])
           Ajax.set_header(response, :controller, self.class.controller_name)
+
+          _render_template(options)
         end
-        render_without_ajax(options, extra_options, &block)
       end
 
-      # Return the layout to use for an AJAX request, or the default layout if one
-      # cannot be found.  If no default is known, <tt>layouts/ajax/application</tt> is used.
+      # Return the layout to use for an AJAX request, or nil if the default should be used.
       #
       # If no ajax_layout is set, look for the default layout in <tt>layouts/ajax</tt>.
       # If the layout cannot be found, use the default.
-      #
-      # FIXME: Use hard-coded html layout extension because <tt>default_template_format</tt>
-      # is sometimes :js which means the layout isn't found.
       def _layout_for_ajax(default) #:nodoc:
         ajax_layout = self.class.read_inheritable_attribute(:ajax_layout)
-        if ajax_layout.nil? || !(ajax_layout =~ /^layouts\/ajax/)
-          find_layout("layouts/ajax/#{default.sub(/layouts(\/)?/, '')}", 'html') unless default.nil?
-        else
-          ajax_layout
-        end
+        ajax_layout = if ajax_layout.nil? && default.nil?
+            nil
+          elsif ajax_layout.nil? && !default.nil? # look for one with the default name in layouts/ajax
+            "layouts/ajax/#{default.sub(/layouts(\/)?/, '')}"
+          elsif ajax_layout && !(ajax_layout =~ /^layouts\/ajax/) # look for it in layouts/ajax
+            "layouts/ajax/#{ajax_layout}"
+          else # look as is
+            ajax_layout
+          end
+        Ajax.app.rails?(3) ? find_template(ajax_layout) : find_layout(ajax_layout, 'html') if !ajax_layout.nil?
       rescue ::ActionView::MissingTemplate
-        Ajax.logger.info("[ajax] no layout found in layouts/ajax using #{default}")
-        default
+        Ajax.logger.info("[ajax] no layout found in layouts/ajax.  Using #{default}.")
+        nil
       end
+    end
   end
 end
