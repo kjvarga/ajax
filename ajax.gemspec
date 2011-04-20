@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga"]
-  s.date = %q{2011-03-25}
+  s.date = %q{2011-04-19}
   s.description = %q{Augment a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users, such as testing, SEO and browser history.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
@@ -23,7 +23,6 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "app/controllers/ajax_controller.rb",
-     "app/views/ajax/_redirect_with_fragment.html.erb",
      "app/views/ajax/framework.html.erb",
      "config/initializers/ajax.rb",
      "init.rb",
@@ -38,8 +37,10 @@ Gem::Specification.new do |s|
      "lib/ajax/helpers/url_helper.rb",
      "lib/ajax/railtie.rb",
      "lib/ajax/routes.rb",
-     "lib/ajax/spec/extension.rb",
-     "lib/ajax/spec/helpers.rb",
+     "lib/ajax/rspec.rb",
+     "lib/ajax/rspec/extension.rb",
+     "lib/ajax/rspec/helpers.rb",
+     "lib/ajax/rspec/integration.rb",
      "lib/ajax/tasks.rb",
      "lib/rack-ajax.rb",
      "lib/rack-ajax/decision_tree.rb",
