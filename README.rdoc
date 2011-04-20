@@ -10,7 +10,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
-* v1.0.9: Rails 3.0.5 compatibility
+* v1.1.0: Rails 3 supported!
 
 == Install
 
@@ -22,6 +22,11 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 2. <tt>bundle</tt>
 3. <tt>rake ajax:install</tt>
+4. The framework route will automatically be added to your application but if you have catch-all routes they will take precedence.  If that is the case, you can add the route to <tt>config/routes.rb</tt> like so:
+
+    YourAppName::Application.routes.draw do
+      Ajax::Routes.draw(self)
+    end
 
 === Rails 2
 
@@ -196,7 +201,7 @@ If you need to expose external APIs you can do so using a regular expression tha
 
 == Compatibility
 
-You must be running <b>jQuery 1.4.2</b> to use this plugin.  Sorry, Prototype users.
+You must be running <b>jQuery >= 1.4.2</b> to use this plugin.  Sorry, Prototype users.
 
 The following JavaScript libraries are required and included in the plugin:
 
@@ -205,9 +210,8 @@ The following JavaScript libraries are required and included in the plugin:
 
 === Ruby and Rails:
 
-* Rails 3.0.5 running Ruby 1.8.7 and Ruby 1.9
-* Rails 2.3.4 running Ruby 1.8.7 and Ruby 1.9
-* Rails 2.3.5 running Ruby 1.8.7 and Ruby 1.9
+* Rails 2.3.4, 2.3.5, 3.0.5, 3.0.7
+* Ruby 1.8.7, 1.9.1, 1.9.2
 
 === Browsers:
 
