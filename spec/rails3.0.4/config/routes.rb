@@ -1,4 +1,5 @@
 Rails304::Application.routes.draw do
+  Ajax::Routes.draw(self)
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
