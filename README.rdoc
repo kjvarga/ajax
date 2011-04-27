@@ -10,6 +10,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
+* v1.1.1: Backwards compatibility fix for Rails < 3
 * v1.1.0: Rails 3 supported!
 
 == Install
