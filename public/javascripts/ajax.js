@@ -448,7 +448,9 @@ var Ajax = function(options) {
    */
   self.abortCurrentRequest = function() {
     try {
-      console.log('[ajax] aborting current request for url ' + self.current_request.url);
+      if (self.current_request.url) {
+        console.log('[ajax] aborting current request for url ' + self.current_request.url);
+      }
       self.current_request.abort();
     } catch(e) {
       console.log('[ajax] abort failed!', e);
