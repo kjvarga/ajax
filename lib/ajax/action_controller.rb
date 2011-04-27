@@ -198,7 +198,7 @@ module Ajax
       if special_redirect
         session[:redirected_to] = nil
         Ajax.logger.info("[ajax] returning special redirect JS")
-        self.response.body = <<END
+        render :text => <<-END
 <script type="text/javascript">
 var url = #{url.to_json};
 var hash = document.location.hash;
@@ -225,7 +225,7 @@ END
           redirect_path = URI.parse(url).select(:fragment).first
           Ajax.logger.info("[ajax] redirect path is #{redirect_path}")
           Ajax.set_header(response, :soft_redirect, redirect_path)
-          self.response.body = <<END
+          render :text => <<-END
 <script type="text/javascript">
 window.location.href = #{url.to_json};
 </script>
