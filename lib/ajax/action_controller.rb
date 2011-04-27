@@ -120,8 +120,9 @@ module Ajax
       # Rails 3 hook.  Rails < 3 is handled using redirect_to_full_url.  See
       # those docs for info.
       def redirect_to(url={}, status={})
-        super
-        self.location = nil if _ajax_redirect(url, status) # clear any location set by super
+        if !_ajax_redirect(url, status)
+          super
+        end
       end
 
       #
