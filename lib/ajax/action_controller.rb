@@ -67,7 +67,9 @@ module Ajax
       #
       # This method only applies to Rails < 3
       def redirect_to_full_url_with_ajax(url, status)
-        redirect_to_full_url_without_ajax(url, status) unless _ajax_redirect(url, status) # Only call super if we didn't handle it
+        if !_ajax_redirect(url, status)
+          redirect_to_full_url_without_ajax(url, status)
+        end
       end
 
       #
@@ -159,7 +161,6 @@ module Ajax
     # otherwise.
     def _ajax_redirect(url, status)
       return false unless Ajax.is_enabled?
-      debugger
       special_redirect = false
       original_url = url
 
