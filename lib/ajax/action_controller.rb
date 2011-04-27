@@ -47,7 +47,7 @@ module Ajax
       def self.included(klass)
         klass.class_eval do
           alias_method_chain :redirect_to_full_url, :ajax
-          #alias_method_chain :render, :ajax
+          alias_method_chain :render, :ajax
         end
       end
 
@@ -75,10 +75,8 @@ module Ajax
       #
       # Intercept rendering to customize the headers and layout handling
       #
-      def render(options = nil, extra_options = {}, &block)
-        debugger
-        raise 'called render with ajax!!'
-        return super unless Ajax.is_enabled?
+      def render_with_ajax(options = nil, extra_options = {}, &block)
+        return render_without_ajax(options, extra_options, &block) unless Ajax.is_enabled?
 
         original_args = [options, extra_options]
         if request.xhr?
@@ -113,7 +111,7 @@ module Ajax
           Ajax.set_header(response, :layout, ajax_layout)
           Ajax.set_header(response, :controller, self.class.controller_name)
         end
-        super(options, extra_options, &block)
+        render_without_ajax(options, extra_options, &block)
       end
 
     end
