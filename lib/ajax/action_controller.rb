@@ -125,22 +125,19 @@ module Ajax
         end
       end
 
-      #
-      # Intercept rendering to customize the headers and layout handling
-      #
-      def render_to_body(options = {})
-        return super if !request.xhr? || !Ajax.is_enabled?
-        _process_options(options)
-
-        if ajax_layout = _layout_for_ajax(options[:layout])
-          options[:layout] = ajax_layout.virtual_path
+      # Specialize the default layout finder.  Try to use a layout in layouts/ajax
+      # as the default layout, if one exists.
+      def _default_layout(require_layout = false)
+        if require_layout || !request.xhr? || !Ajax.is_enabled?
+          super
+        else
+          layout_name = super
+          if ajax_layout = _layout_for_ajax(layout_name)
+            ajax_layout.virtual_path
+          else
+            layout_name
+          end
         end
-
-        # Send the current layout and controller in a custom response header
-        Ajax.set_header(response, :layout, options[:layout])
-        Ajax.set_header(response, :controller, self.class.controller_name)
-
-        _render_template(options)
       end
     end
 
