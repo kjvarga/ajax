@@ -156,13 +156,13 @@ module Ajax
     # Return true if an Ajax "redirect" was performed, and false
     # otherwise.
     def _ajax_redirect(url, status)
-      return false unless Ajax.is_enabled?
+      return false if url.nil? || !Ajax.is_enabled?
       special_redirect = false
       original_url = url
 
       # If we have the full referrer in Ajax-Info, use that because it
       # includes the fragment.
-      if url == request.headers["Referer"] && !request.headers['Ajax-Info'].blank?
+      if url == request.headers["Referer"] && !request.headers['Ajax-Info'].blank? && !request.headers['Ajax-Info']['referer'].blank?
         url = request.headers['Ajax-Info']['referer']
         Ajax.logger.debug("[ajax] using referer #{url} from Ajax-Info")
       end
