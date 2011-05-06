@@ -14,7 +14,9 @@ module Ajax
       UPDATE_JAVASCRIPT_FILES = %w[
         public/javascripts/ajax.js]
 
-      def copy_unless_exists(file, from_dir=Ajax.root, to_dir=Rails.root)
+      def copy_unless_exists(file, from_dir=nil, to_dir=nil)
+        to_dir ||= Rails.root.to_s
+        from_dir ||= Ajax.root.to_s
         from_file, to_file = File.join(from_dir, file), File.join(to_dir, file)
         if File.exist?(to_file)
           return false
@@ -27,7 +29,9 @@ module Ajax
         e
       end
 
-      def copy_and_overwrite(file, from_dir=Ajax.root, to_dir=Rails.root)
+      def copy_and_overwrite(file, from_dir=nil, to_dir=nil)
+        to_dir ||= Rails.root.to_s
+        from_dir ||= Ajax.root.to_s
         from_file, to_file = File.join(from_dir, file), File.join(to_dir, file)
         FileUtils.mkdir_p(File.dirname(to_file)) unless File.directory?(File.dirname(to_file))
         FileUtils.cp(from_file, to_file)
