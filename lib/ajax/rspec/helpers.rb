@@ -3,7 +3,6 @@ require 'uri'
 module Ajax
   module RSpec
     module Helpers
-
       def create_app
         @app = Class.new { def call(env); true; end }.new
       end

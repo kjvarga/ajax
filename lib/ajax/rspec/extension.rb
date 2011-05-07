@@ -1,10 +1,6 @@
 module Ajax
   module RSpec
     module Extension
-      def included(base)
-        require 'ajax/rspec/integration'
-      end
-
       def integrate_ajax
         Ajax.enabled = true
       end
