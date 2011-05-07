@@ -15,12 +15,7 @@ module Ajax::RSpec::Integration
         disable_ajax
       end
     end
-  end
-end
-
-# ActiveSupport::TestCase integration
-module ActiveSupport
-  class TestCase
-    include Ajax::RSpec::Extension
+  elsif defined?(ActiveSupport::TestCase)
+    ActiveSupport::TestCase.send(:include, Ajax::RSpec::Extension)
   end
 end
