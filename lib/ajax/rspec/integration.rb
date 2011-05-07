@@ -8,8 +8,9 @@ module Ajax::RSpec::Integration
         disable_ajax
       end
     end
-  elsif defined?(::Spec)
+  elsif defined?(::Spec::Runner)
     ::Spec::Runner.configure do |c|
+      include Ajax::RSpec::Extension
       c.before :all do
         disable_ajax
       end
