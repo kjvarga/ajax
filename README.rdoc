@@ -10,11 +10,12 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
+* v1.1.5: Fix inclusion of +controller+ and +layout+ in <tt>Ajax-Info</tt> response header.  Improve RSpec 1.* integration
 * v1.1.4: Fix RSpec 2 integration
 * v1.1.3: Guard against possible nil values for the redirect_to url and the referrers
 * v1.1.2: Fix Rails 3 render hook so it doesn't break rendering with no layout e.g. <tt>render :json => ...</tt>
 * v1.1.1: Backwards compatibility fix for Rails < 3
-* v1.1.0: Rails 3 supported!
+* <b>v1.1.0: Rails 3 supported!</b>
 
 == Install
 
@@ -26,7 +27,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 2. <tt>bundle</tt>
 3. <tt>rake ajax:install</tt>
-4. The framework route will automatically be added to your application but if you have catch-all routes they will take precedence.  If that is the case, you can add the route to <tt>config/routes.rb</tt> like so:
+4. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.  The route will automatically be added to your application but if you have catch-all routes they will take precedence, so if that is the case, you can add the route to <tt>config/routes.rb</tt> manually like so:
 
     YourAppName::Application.routes.draw do
       Ajax::Routes.draw(self)
@@ -58,11 +59,19 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
       Ajax::Routes.draw(map)
     end
 
+5. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.
+
 <b> As a Plugin</b>
 
-  ./script/plugin install http://github.com/kjvarga/ajax.git
+1.  ./script/plugin install http://github.com/kjvarga/ajax.git
+2.  Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.
 
-=== Sample Output
+=== Rake Tasks
+
+  $ rake -T ajax
+  rake ajax:install            # Install required Ajax files.
+  rake ajax:install:specs      # Copy Ajax integration spec into spec/integration/ajax_spec.rb.
+  rake ajax:update:javascript  # Overwrite public/javascripts/ajax.js with the latest version.
 
   $ rake ajax:install
   created: app/controllers/ajax_controller.rb
@@ -77,7 +86,14 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
   $ rake ajax:install:specs
   already exists: spec/integration/ajax_spec.rb
 
+  $ rake ajax:update:javascript
+  created: public/javascripts/ajax.js
+
 == Getting Started
+
+1. Include the JavaScript assets in your <tt>app/views/layouts/application.html.erb</tt> file.  For example:
+
+    <%= javascript_include_tag 'jquery', 'jquery.address-1.3', 'ajax', 'application' %>
 
 1. Ajax looks for a layout to use for an Ajax request in <tt>app/views/layouts/ajax/</tt>.  It looks for a layout with the same name as the default Rails layout for that action.  So copy your existing layouts into <tt>layouts/ajax/</tt> and get them ready for Ajax by removing any excess HTML, leaving just the content that will be inserted into the container.
 
@@ -98,7 +114,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 3. Add a <tt>data-deep-link</tt> attribute to links that you want to load using the Ajax framework.  A jQuery live event automatically intercepts all clicks on links with this attribute and loads their content using the framework.
 
-   By default all links that use the Rails link helpers will include this attribute.  When a link with this attribute is clicked, content is requested using AJAX and goes through the Ajax framework.  Rails receives a request for content at the <tt>data-deep-link</tt> location.  The content is rendered using the default layout for the action but from the <tt>app/views/layouts/ajax</tt> directory.  The rendered content is received client-side and special Ajax headers are processed.  The content is then inserted into the specified container, or the <tt>default_container</tt> defined in your Ajax JS class above.
+   By default all links that use the Rails link helpers will include this attribute, so you won't need to do anything.  When a link with this attribute is clicked, content is requested using AJAX and goes through the Ajax framework.  Rails receives a request for content at the <tt>data-deep-link</tt> location.  The content is rendered using the default layout for the action but from the <tt>app/views/layouts/ajax</tt> directory.  The rendered content is received client-side and special Ajax headers are processed.  The content is then inserted into the specified container, or the <tt>default_container</tt> defined in your Ajax JS class above.
 
 4. To submit forms using the Ajax framework, or to manually request content using various request methods, you can call <tt>window.ajax.loadPage</tt>, passing in options like _url_, _method_ and _data_.
 
@@ -451,9 +467,25 @@ To ease some of the pain, observe some of the following advice:
 
 == Testing
 
-* We use RSpec
-* See <tt>Ajax::Spec::Helpers</tt> and <tt>Ajax::Spec::Extension</tt> {in the rdocs}[http://rdoc.info/projects/kjvarga/ajax]
-* Copy <tt>ajax/spec/integration/ajax_spec.rb</tt> into your project to ensure that the Ajax integration always works.
+Ajax comes with RSpec integration tests for RSpec 1 and 2 and <tt>ActiveSupport::TestCase</tt>.  You don't have to add anything to your <tt>spec/spec_helper.rb</tt> file.  Just run the rake task to copy
+the integration spec into <tt>spec/integration/ajax_spec.rb</tt>:
+
+  rake ajax:install:specs
+
+If you want to do add your own specs, you can make use of helper methods defined
+in the <tt>Ajax::RSpec::Extension</tt> module.  To make these methods available
+to all your specs just add a require to your <tt>spec/spec_helper.rb</tt>:
+
+  # spec/spec_helper.rb
+  require 'ajax/rspec'
+
+If <tt>ajax/rspec</tt> has been required before the testing framework has
+been defined (Spec, RSpec or ActiveSupport::TestCase) the extension methods will
+not have been integrated.  In this case you can force re-integration by calling:
+
+  Ajax::RSpec.setup
+
+* See <tt>Ajax::RSpec::Helpers</tt> and <tt>Ajax::RSpec::Extension</tt> {in the rdocs}[http://rdoc.info/projects/kjvarga/ajax]
 
 == Contributions
 

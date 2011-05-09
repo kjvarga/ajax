@@ -106,14 +106,9 @@ module Ajax
           ajax_layout = _layout_for_ajax(default)
           ajax_layout = ajax_layout.path_without_format_and_extension unless ajax_layout.nil?
           options[:layout] = ajax_layout unless ajax_layout.nil?
-
-          # Send the current layout and controller in a custom response header
-          Ajax.set_header(response, :layout, ajax_layout)
-          Ajax.set_header(response, :controller, self.class.controller_name)
         end
         render_without_ajax(options, extra_options, &block)
       end
-
     end
 
     module Rails3
@@ -145,11 +140,16 @@ module Ajax
 
     # Convert the Ajax-Info hash to JSON before the request is sent.
     # Invoked as an after filter.
+    #
+    # Adds the current +layout+ and +controller+ to the hash.
+    # These values will be sent in future requests using the Ajax-Info header.
+    #
+    # +controller+ is the result of calling ActionController#controller_name, so
+    # if your controller is ApplicationController the value will be <tt>'application'</tt>.
     def serialize_ajax_info
-      case response.headers['Ajax-Info']
-      when Hash
-        response.headers['Ajax-Info'] = response.headers['Ajax-Info'].to_json
-      end
+      Ajax.set_header(response, :layout, Ajax.app.rails?(3) ? _layout : active_layout)
+      Ajax.set_header(response, :controller, self.class.controller_name)
+      response.headers['Ajax-Info'] = Ajax.send(:serialize_hash, response.headers['Ajax-Info'])
     end
 
     # Perform special processing on the response if we need to.

@@ -27,15 +27,9 @@ module Rack
       return @app.call(env) unless ::Ajax.is_enabled?
 
       # Parse the Ajax-Info header
-      if env["HTTP_AJAX_INFO"].nil?
-        env["Ajax-Info"] = {}
-      elsif env["HTTP_AJAX_INFO"].is_a?(String)
-        env["Ajax-Info"] = (JSON.parse(env['HTTP_AJAX_INFO']) rescue {})
-      end
-
+      env["Ajax-Info"] = ::Ajax.unserialize_hash(env['HTTP_AJAX_INFO'])
       @parser = Parser.new(env)
       rack_response = @parser.instance_eval(&@decision_tree)
-
 
       # Clear the value of session[:redirected_to]
       unless env['rack.session'].nil?

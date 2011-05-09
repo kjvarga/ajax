@@ -27,32 +27,25 @@ module Ajax
         headers = object.is_a?(Hash) ? object : object.headers # ::ActionController::Response
         key = key.to_s
 
-        info = case headers["Ajax-Info"]
-        when String
-          JSON.parse(headers["Ajax-Info"]) rescue {}
-        when Hash
-          headers["Ajax-Info"]
-        else
-          {}
-        end
+        headers["Ajax-Info"] = serialize_hash(headers["Ajax-Info"]) do |info|
+          # Deep merge hashes
+          if info.has_key?(key) &&
+              value.is_a?(Hash) &&
+              info[key].is_a?(Hash)
+            value = value.stringify_keys!
+            value = info[key].merge(value, &DEEP_MERGE)
+          end
 
-        # Deep merge hashes
-        if info.has_key?(key) &&
-            value.is_a?(Hash) &&
-            info[key].is_a?(Hash)
-          value = value.stringify_keys!
-          value = info[key].merge(value, &DEEP_MERGE)
-        end
+          # Concat arrays
+          if info.has_key?(key) &&
+              value.is_a?(Array) &&
+              info[key].is_a?(Array)
+            value = info[key].concat(value)
+          end
 
-        # Concat arrays
-        if info.has_key?(key) &&
-            value.is_a?(Array) &&
-            info[key].is_a?(Array)
-          value = info[key].concat(value)
+          # Set the value for this key
+          info[key] = value
         end
-
-        info[key] = value
-        headers["Ajax-Info"] = info.to_json
       end
 
       # Return the value at key <tt>key</tt> from the <tt>Ajax-Info</tt> header
@@ -62,17 +55,7 @@ module Ajax
       # <tt>key</tt> Symbol or String hash key, converted to String
       def get_header(object, key)
         headers = object.is_a?(Hash) ? object : object.headers # ::ActionController::Request
-        key = key.to_s
-
-        info = case headers["Ajax-Info"]
-        when String
-          JSON.parse(headers["Ajax-Info"]) rescue {}
-        when Hash
-          headers["Ajax-Info"]
-        else
-          {}
-        end
-        info[key]
+        unserialize_hash(headers["Ajax-Info"])[key.to_s]
       end
 
       # Set one or more paths that can be accessed directly without the AJAX framework.
@@ -110,6 +93,27 @@ module Ajax
         !!((@exclude_paths || []).find do |excluded|
           !!excluded.match(path)
         end)
+      end
+
+      # Return JSON given a Hash or JSON string.  If a block is given, yields
+      # the Hash to the block so that the block can modify it before it is
+      # converted to JSON.
+      def serialize_hash(hash, &block)
+        info = unserialize_hash(hash)
+        yield info if block_given?
+        info.to_json
+      end
+
+      # Return a Hash given JSON or a Hash.
+      def unserialize_hash(hash)
+        case hash
+        when String
+          JSON.parse(hash) rescue {}
+        when Hash
+          hash
+        else
+          {}
+        end
       end
     end
   end

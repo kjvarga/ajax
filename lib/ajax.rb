@@ -2,7 +2,6 @@ require 'rack-ajax'
 require 'ajax/helpers'
 require 'ajax/application'
 require 'ajax/routes'
-require 'ajax/rspec'
 require 'pathname'
 # require railties at the end
 

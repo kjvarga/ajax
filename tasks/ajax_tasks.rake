@@ -40,7 +40,7 @@ END
   end
 
   namespace :install do
-    desc "Copy Ajax integration spec tests into spec/integration."
+    desc "Copy Ajax integration spec into spec/integration/ajax_spec.rb."
     task :specs do
       file = (Ajax.app.root + 'spec/integration/ajax_spec.rb').to_s
       if File.exist?(file)
