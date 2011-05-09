@@ -17,33 +17,29 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 * v1.1.1: Backwards compatibility fix for Rails < 3
 * <b>v1.1.0: Rails 3 supported!</b>
 
-== Install
+== Install for Rails
+
+After getting the Gem installed, take a look at <b>Getting Started</b> for more information about setting up your application for Ajax.
 
 === Rails 3
 
-1. Add the gem to your <tt>Gemspec</tt>
+Add the gem to your <tt>Gemspec</tt>:
 
-     gem 'ajax'
+   gem 'ajax'
 
-2. <tt>bundle</tt>
-3. <tt>rake ajax:install</tt>
-4. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.  The route will automatically be added to your application but if you have catch-all routes they will take precedence, so if that is the case, you can add the route to <tt>config/routes.rb</tt> manually like so:
+Then run +bundle+.
 
-    YourAppName::Application.routes.draw do
-      Ajax::Routes.draw(self)
-    end
+=== Rails 2 Gem
 
-=== Rails 2
+1. Follow the Rails 3 install if you are using a <tt>Gemfile</tt>.
 
-<b> As a Gem</b>
-
-1. Add the gem as a dependency in your <tt>config/environment.rb</tt>
+   If you are not using a <tt>Gemfile</tt> add the gem to your <tt>config/environment.rb</tt> configuration block with:
 
      config.gem 'ajax'
 
-2. <tt>rake gems:install</tt>
+   Then run <tt>rake gems:install</tt>.
 
-3. Add to your <tt>Rakefile</tt>
+2. Include the gem's Rake tasks in your <tt>Rakefile</tt>:
 
      begin
        require 'ajax/tasks'
@@ -51,72 +47,105 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
        puts "Warning, couldn't load gem tasks: #{e.message}! Skipping..."
      end
 
-4. <tt>rake ajax:install</tt> to install required files.  This command is safe to run multiple times.  It will skip existing files.
+3. Add a route for the framework path to your <tt>config/routes.rb</tt>:
 
-4. Add a route for the framework path to your <tt>config/routes.rb</tt>
+     ActionController::Routing::Routes.draw do |map|
+       Ajax::Routes.draw(map)
+     end
+
+=== Rails 2 Plugin
+
+Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your application's root directory.
+
+== Getting Started
+
+1. First run <tt>rake -T ajax</tt> to see the Rake tasks provided and to verify that the gem and its Rake tasks are being included properly.
+
+
+2. Run <tt>rake ajax:install</tt> to install required asset files into various application directories.  The output from running the command will list the files that are created.
+
+
+3. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.  It should route to <tt>AjaxController#framework</tt>.
+
+   The route will automatically be added to your application if you are running Rails 3 or Ajax is installed as a plugin.  If you are running Rails 2 you must add it to your routes file yourself.
+
+   If you have catch-all routes they may take precedence, so if that is the case you will have to add it to the top of your <tt>config/routes.rb</tt> to ensure it comes first.
+
+   <b>Rails 2</b>:
 
     ActionController::Routing::Routes.draw do |map|
       Ajax::Routes.draw(map)
     end
 
-5. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.
+   <b>Rails 3</b>:
 
-<b> As a Plugin</b>
+    YourAppName::Application.routes.draw do
+      Ajax::Routes.draw(self)
+    end
 
-1.  ./script/plugin install http://github.com/kjvarga/ajax.git
-2.  Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.
+4. Run <tt>rake ajax:install</tt> to copy required assets into your application and public directories.  The command is safe to run multiple times and will not overwrite existing files.
 
-=== Rake Tasks
+5. Include the JavaScript files in your application layout file:
 
-  $ rake -T ajax
-  rake ajax:install            # Install required Ajax files.
-  rake ajax:install:specs      # Copy Ajax integration spec into spec/integration/ajax_spec.rb.
-  rake ajax:update:javascript  # Overwrite public/javascripts/ajax.js with the latest version.
+     # app/views/layouts/application.html.erb
+     <%= javascript_include_tag 'jquery', 'jquery.json-2.2.min', 'jquery.address-1.3', 'ajax', 'application' %>
 
-  $ rake ajax:install
-  created: app/controllers/ajax_controller.rb
-  created: app/views/ajax/framework.html.erb
-  created: config/initializers/ajax.rb
-  created: public/javascripts/ajax.js
-  created: public/javascripts/jquery.address-1.3.js
-  created: public/javascripts/jquery.address-1.3.min.js
-  created: public/javascripts/jquery.json-2.2.min.js
-  created: public/images/ajax-loading.gif
+   While you are in this file, add a container element that will be the default container to receive content loaded via the Ajax framework.  Usually this is the main body of the page below the header.  For example:
 
-  $ rake ajax:install:specs
-  already exists: spec/integration/ajax_spec.rb
+     # app/views/layouts/application.html.erb
+     <div id="main">
+       <%= yield %>
+     </div>
 
-  $ rake ajax:update:javascript
-  created: public/javascripts/ajax.js
+6. Instantiate an instance of the Ajax JavaScript class in your <tt>application.js</tt>.  This object will handle clicks on links, communication with the server and provide methods that you can use for custom behaviour.
 
-== Getting Started
+   An example of creating the Ajax instance:
 
-1. Include the JavaScript assets in your <tt>app/views/layouts/application.html.erb</tt> file.  For example:
+      // public/javascripts/application.js
+      if (typeof(Ajax) != 'undefined') {
+        window.ajax = new Ajax({
+          default_container: '#main',  // jQuery selector of your container element
+          enabled: true,               // Enable/disable the plugin
+          lazy_load_assets: false      // YMMV
+        });
+      }
 
-    <%= javascript_include_tag 'jquery', 'jquery.address-1.3', 'ajax', 'application' %>
+   Make sure you set your <b>default_container</b> correctly.  The selector you use must match the container element you added in <tt>app/views/layouts/application.html.erb</tt> in the previous step.
 
-1. Ajax looks for a layout to use for an Ajax request in <tt>app/views/layouts/ajax/</tt>.  It looks for a layout with the same name as the default Rails layout for that action.  So copy your existing layouts into <tt>layouts/ajax/</tt> and get them ready for Ajax by removing any excess HTML, leaving just the content that will be inserted into the container.
+7. Ajax should now be installed and configured and ready to handle requests.  Start your Rails server, open your favorite browser and load the home page.  Using the browser's developer tools take a look at the console.  You should not see any JavaScript errors.
 
-   Your main layout should contain a container element to receive page content.  Typically this would be a container below your page header.  If you don't have a static header, you can make the whole BODY element the container.
+   If everything is working correctly when you load the root url <tt>/</tt> the URL should change to <tt>/#</tt> and you should see some output in the console like:
+
+    [ajax] loadPage /
+    GET http://localhost:3000/?_=1304973841796
+    [ajax] in response handler! status: 200
+    [ajax] extracted body [6..1828] chars
+    [ajax] using container #main
+    [ajax] got ajax-info Object {}
+
+   In the server logs your should see two requests.  One is a normal GET request for <tt>/</tt> which should be processed by <tt>AjaxController#framework</tt> and another which is an AJAX GET request also for <tt>/</tt> which is handled by whatever you have set your application's root path handler to.
+
+   Congratulations on getting everything setup and working!  Now you can start customizing your setup further and adding new functionality.
+
+8. At this point it is a good idea to include the Ajax integration specs in your application to ensure that Ajax is properly integrated going forward.  If you are running RSpec 1 or 2 this is as simple as running:
+
+     rake ajax:install:specs
+
+   This adds <tt>spec/integration/ajax_spec.rb</tt> to your specs.  Run your specs and verify that they are all passing.
+
+== Next Steps
+
+1. Ajax looks for a layout to use for an Ajax-handled request in <tt>app/views/layouts/ajax/</tt>.  It looks for a layout with the same name as the  Rails layout that is configured for that action.  So copy your existing layouts into <tt>layouts/ajax/</tt> and get them ready by removing all the excess HTML, like the HEAD section and the BODY element.  You want to leave just the HTML content that will be inserted into your container element.
 
    Here is an {example of converting our <tt>layouts/application.html.haml</tt> to <tt>layouts/ajax/application.html.haml</tt>}[http://gist.github.com/373133/5a80a63ef69a883ed3c5630b68330b1036ad01ec].
 
-2. Instantiate an instance of the Ajax class in <tt>public/javascripts/application.js</tt>.  For example:
+2. Add a <tt>data-deep-link</tt> attribute to links that you want to load using the Ajax framework.  A jQuery live event automatically intercepts all clicks on links with this attribute and loads their content using the framework.
 
-    // public/javascripts/application.js
-    if (typeof(Ajax) != 'undefined') {
-      window.ajax = new Ajax({
-        default_container: '#main',  // jQuery selector of your container element
-        enabled: true,               // Enable/disable the plugin
-        lazy_load_assets: false      // YMMV
-      });
-    }
+   By default all links that use the Rails link helpers will include this attribute, so you won't need to do anything.
 
-3. Add a <tt>data-deep-link</tt> attribute to links that you want to load using the Ajax framework.  A jQuery live event automatically intercepts all clicks on links with this attribute and loads their content using the framework.
+   When a link with this attribute is clicked, content is requested using AJAX and goes through the Ajax framework.  Rails receives a request for content at the <tt>data-deep-link</tt> location.  The content is rendered using the default layout for the action but from the <tt>app/views/layouts/ajax</tt> directory.  The rendered content is received client-side and special Ajax headers are processed.  The content is then inserted into the specified container, or the <tt>default_container</tt> defined in your Ajax JS class above.
 
-   By default all links that use the Rails link helpers will include this attribute, so you won't need to do anything.  When a link with this attribute is clicked, content is requested using AJAX and goes through the Ajax framework.  Rails receives a request for content at the <tt>data-deep-link</tt> location.  The content is rendered using the default layout for the action but from the <tt>app/views/layouts/ajax</tt> directory.  The rendered content is received client-side and special Ajax headers are processed.  The content is then inserted into the specified container, or the <tt>default_container</tt> defined in your Ajax JS class above.
-
-4. To submit forms using the Ajax framework, or to manually request content using various request methods, you can call <tt>window.ajax.loadPage</tt>, passing in options like _url_, _method_ and _data_.
+4. To submit forms using the Ajax framework, or to manually request content using various request methods, you can call <tt>window.ajax.loadPage</tt>, passing in options like +url, +method+ and +data+.
 
    For example to handle form submissions with Ajax, you could use code like the following:
 
@@ -135,6 +164,23 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
       # app/views/layouts/ajax/two_column.html.haml
       ajax_header :container, '#twocolumns'
+
+   Ajax provides helper methods for you to use.  In your controllers you can call <tt>ajax_header</tt> and <tt>ajax_layout</tt> to add configuration for the whole controller or on a per-action basis:
+
+   For example:
+      # app/controllers/application_controller.rb
+      ApplciationController < ActionController::Base
+        ajax_header :tab, "#app-tab"
+
+        def maintenance
+          ajax_layout :maintenance
+          render
+        end
+      end
+
+   In your views you only have access to <tt>ajax_header</tt>.
+
+   Lots of other useful methods are provided by the <tt>Ajax<tt> module.  Take a look at the documentation for more information.
 
 6. Specify tabs that should be activated on a per-action, per-controller or dynamic basis using the <tt>ajax_header :tab, '<jquery css selector>'</tt> helper method.  The element(s) that match the selector will have their _activate_ event triggered, so you will need to setup an event handler.
 
@@ -247,6 +293,39 @@ The following JavaScript libraries are required and included in the plugin:
 = Documentation
 
 Please browse the {API documentation at rDoc.info}[http://rdoc.info/projects/kjvarga/ajax]
+
+=== Rake Tasks
+
+Here are the rake tasks provided and sample output from running them.
+
+To see the tasks provided:
+
+  $ rake -T ajax
+  rake ajax:install            # Install required Ajax files.
+  rake ajax:install:specs      # Copy Ajax integration spec into spec/integration/ajax_spec.rb.
+  rake ajax:update:javascript  # Overwrite public/javascripts/ajax.js with the latest version.
+
+The install task:
+
+  $ rake ajax:install
+  created: app/controllers/ajax_controller.rb
+  created: app/views/ajax/framework.html.erb
+  created: config/initializers/ajax.rb
+  created: public/javascripts/ajax.js
+  created: public/javascripts/jquery.address-1.3.js
+  created: public/javascripts/jquery.address-1.3.min.js
+  created: public/javascripts/jquery.json-2.2.min.js
+  created: public/images/ajax-loading.gif
+
+Copy an integration RSpec into your <tt>spec/</tt> directory:
+
+  $ rake ajax:install:specs
+  already exists: spec/integration/ajax_spec.rb
+
+Update the <tt>ajax.js</tt> javascript file:
+
+  $ rake ajax:update:javascript
+  created: public/javascripts/ajax.js
 
 == Configuration
 
@@ -485,7 +564,7 @@ not have been integrated.  In this case you can force re-integration by calling:
 
   Ajax::RSpec.setup
 
-* See <tt>Ajax::RSpec::Helpers</tt> and <tt>Ajax::RSpec::Extension</tt> {in the rdocs}[http://rdoc.info/projects/kjvarga/ajax]
+See <tt>Ajax::RSpec::Helpers</tt> and <tt>Ajax::RSpec::Extension</tt> {in the rdocs}[http://rdoc.info/projects/kjvarga/ajax]
 
 == Contributions
 
