@@ -338,7 +338,7 @@ var Ajax = function(options) {
   self.addressChanged = function() {
     if (document.location.pathname != '/') { return false; }
     if (self.disable_next_address_intercept) {
-      console.log('skipping address intercept & resetting disable_next_address_intercept');
+      console.log('[ajax] skipping address intercept & resetting disable_next_address_intercept');
       self.disable_next_address_intercept = false;
       return false;
     }
@@ -357,14 +357,14 @@ var Ajax = function(options) {
     // Clean up the URL before making the request.  If the URL changes
     // as a result of this, update it, which will trigger this
     // callback again.
-    console.log('cleaning up the url');
+    //console.log('cleaning up the url');
     var url = ($.address.value()).replace(/\/\//, '/');
     if (url != $.address.value()) {
-      console.log('reloading because encoded uri ' + url + ' differs from current uri ' + $.address.value());
+      console.log('[ajax] reloading because encoded uri ' + url + ' differs from current uri ' + $.address.value());
       $.address.value(url);
       return false;
     } else {
-      console.log('going ahead with load');
+      //console.log('going ahead with load');
       self.loadPage({
         url: url
       });
@@ -501,13 +501,13 @@ var Ajax = function(options) {
     }
     if (document.location.pathname != '/') {
       var url = ('/#/' + ajax_url).replace(/\/\//, '/');
-      console.log('linkClicked 1: going to ' + url);
+      //console.log('linkClicked 1: going to ' + url);
       document.location.href = url;
     } else {
       self.last_click_coords = { pageX: event.pageX, pageY: event.pageY };
       encoded_url = ajax.safeURL(ajax_url);
-      console.log('linkClicked 2: going to ' + ajax_url);
-      console.log('untouched url is ' + ajax_url + ', encoded is ' + encoded_url);
+      //console.log('linkClicked 2: going to ' + ajax_url);
+      //console.log('untouched url is ' + ajax_url + ', encoded is ' + encoded_url);
       if ($.browser.msie) {
         $.address.value(encoded_url);
       }
@@ -537,15 +537,15 @@ var Ajax = function(options) {
   self.responseHandler = function(responseText, textStatus, XMLHttpRequest) {
 
     self.last_request_object = XMLHttpRequest;
-    console.log("[AJAX] in response handler! status: " + self.last_request_object.status);
+    console.log("[ajax] in response handler! status: " + self.last_request_object.status);
     if(self.last_request_object.status == 0) {
-      console.log("[AJAX] aborting response handler! ");
+      console.log("[ajax] aborting response handler! ");
       return;
     }
     var data = self.processResponseHeaders(XMLHttpRequest);
 
     if (data.soft_redirect !== undefined) {
-      console.log('**** data.soft_redirect is ' + data.soft_redirect);
+      console.log('[ajax] issuing soft redirect to ' + data.soft_redirect);
       $.address.value(data.soft_redirect);
       return;
     };
@@ -561,7 +561,7 @@ var Ajax = function(options) {
       start += responseText.match(/<\s*body[^>]*>/)[0].length;
       var end   = responseText.search(/<\s*\/\s*body\s*\>/);
 
-      console.log('Extracting body ['+start+'..'+end+'] chars');
+      console.log('[ajax] extracted body ['+start+'..'+end+'] chars');
       responseText = responseText.substr(start, end - start);
 
       var body = $(responseText);
@@ -576,14 +576,14 @@ var Ajax = function(options) {
     //  assets   - load assets
     //  callbacks - execute one or an array of callbacks
     if (data.title !== undefined) {
-      console.log('Using page title '+data.title);
+      console.log('[ajax] set page title '+data.title);
       // commenting this out until we fix ' char bug, removing % chars from page titles for now
       // $.address.title(encodeURIComponent(data.title));
       $.address.title(data.title);
     }
 
     if (data.tab !== undefined) {
-      console.log('Activating tab '+data.tab);
+      console.log('[ajax] activated tab '+data.tab);
       $(data.tab).trigger('activate');
     }
 
@@ -605,8 +605,8 @@ var Ajax = function(options) {
     /**
      * Insert response
     */
-    console.log('Using container ',container.selector);
-    console.log('Set data ',data);
+    console.log('[ajax] using container ', container.selector);
+    console.log('[ajax] got ajax-info ', data);
     container.data('ajax-info', data);
     container.html(responseText);
 
@@ -649,7 +649,7 @@ var Ajax = function(options) {
     try {
       var cookie = XMLHttpRequest.getResponseHeader('Set-Cookie');
       if (cookie !== null) {
-        console.log('Setting cookie');
+        console.log('[ajax] attempting to set cookie');
         document.cookie = cookie;
       }
     } catch(e) {
@@ -666,7 +666,7 @@ var Ajax = function(options) {
     if (data !== null) {
       try { data = jQuery.parseJSON(data); }
       catch(e) {
-        console.log('Failed to parse Ajax-Info header as JSON!', data);
+        console.log('[ajax] failed to parse Ajax-Info header as JSON!', data);
       }
     }
     if (data === null || data === undefined) {
@@ -683,7 +683,7 @@ var Ajax = function(options) {
   self.hideLoadingImage = function() {
     // check if a new request has already started
     if (self.current_request && self.current_request.status == 0) {
-      console.log("[AJAX] aborting hideLoadingImage.. ");
+      console.log("[ajax] aborting hideLoadingImage.. ");
       return;
     }
     if (!self.show_loading_image) { return; }
