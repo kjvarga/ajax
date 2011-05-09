@@ -2,14 +2,16 @@ module Ajax
   module Helpers
     module TaskHelper
       INSTALL_FILES = %w[
+        app/views/layouts/ajax/application.html.erb
         app/controllers/ajax_controller.rb
         app/views/ajax/framework.html.erb
         config/initializers/ajax.rb
+        public/images/ajax-loading.gif
         public/javascripts/ajax.js
         public/javascripts/jquery.address-1.3.js
         public/javascripts/jquery.address-1.3.min.js
         public/javascripts/jquery.json-2.2.min.js
-        public/images/ajax-loading.gif]
+      ]
 
       UPDATE_JAVASCRIPT_FILES = %w[
         public/javascripts/ajax.js]
