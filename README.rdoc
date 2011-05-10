@@ -64,7 +64,6 @@ Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your 
 
 2. Run <tt>rake ajax:install</tt> to install required asset files into various application directories.  The output from running the command will list the files that are created.
 
-
 3. Run <tt>rake routes</tt> to verify that the <tt>/ajax/framework</tt> path is being routed correctly.  It should route to <tt>AjaxController#framework</tt>.
 
    The route will automatically be added to your application if you are running Rails 3 or Ajax is installed as a plugin.  If you are running Rails 2 you must add it to your routes file yourself.
@@ -94,6 +93,9 @@ Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your 
      <div id="main">
        <%= yield %>
      </div>
+
+
+   NOTE: jQuery is NOT provided for you by the install.  You will need to download it to your <tt>public/javascripts</tt> directory yourself.
 
 6. Instantiate an instance of the Ajax JavaScript class in your <tt>application.js</tt>.  This object will handle clicks on links, communication with the server and provide methods that you can use for custom behaviour.
 
