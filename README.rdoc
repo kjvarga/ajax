@@ -83,8 +83,6 @@ Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your 
       Ajax::Routes.draw(self)
     end
 
-4. Run <tt>rake ajax:install</tt> to copy required assets into your application and public directories.  The command is safe to run multiple times and will not overwrite existing files.
-
 5. Include the JavaScript files in your application layout file:
 
      # app/views/layouts/application.html.erb
