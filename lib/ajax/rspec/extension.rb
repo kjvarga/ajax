@@ -1,22 +1,22 @@
 module Ajax
   module RSpec
     module Extension
+      # Enable and unmock
       def integrate_ajax
         Ajax.enabled = true
+        Ajax.mocked = false
       end
 
+      # Disable
       def disable_ajax
         Ajax.enabled = false
       end
+      alias_method :unmock_ajax, :disable_ajax
 
+      # Enable and mock
       def mock_ajax
-        integrate_ajax
+        Ajax.enabled = true
         Ajax.mocked = true
-      end
-
-      def unmock_ajax
-        disable_ajax
-        Ajax.mocked = false
       end
     end
   end
