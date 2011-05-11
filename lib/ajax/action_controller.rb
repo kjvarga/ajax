@@ -67,7 +67,7 @@ module Ajax
       #
       # This method only applies to Rails < 3
       def redirect_to_full_url_with_ajax(url, status)
-        if !_ajax_redirect(url, status)
+        if !_ajax_redirect(url)
           redirect_to_full_url_without_ajax(url, status)
         end
       end
@@ -114,8 +114,9 @@ module Ajax
     module Rails3
       # Rails 3 hook.  Rails < 3 is handled using redirect_to_full_url.  See
       # those docs for info.
-      def redirect_to(url={}, status={})
-        if !_ajax_redirect(url, status)
+      def redirect_to(options = {}, response_status = {})
+        url = _compute_redirect_to_location(options)
+        if !_ajax_redirect(url)
           super
         end
       end
@@ -155,7 +156,7 @@ module Ajax
     # Perform special processing on the response if we need to.
     # Return true if an Ajax "redirect" was performed, and false
     # otherwise.
-    def _ajax_redirect(url, status)
+    def _ajax_redirect(url)
       return false if url.nil? || !Ajax.is_enabled?
       special_redirect = false
       original_url = url
