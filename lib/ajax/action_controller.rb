@@ -103,9 +103,11 @@ module Ajax
 
           default = pick_layout(options)
           default = default.path_without_format_and_extension unless default.nil?
-          ajax_layout = _layout_for_ajax(default)
-          ajax_layout = ajax_layout.path_without_format_and_extension unless ajax_layout.nil?
-          options[:layout] = ajax_layout unless ajax_layout.nil?
+          if ajax_layout = _layout_for_ajax(default)
+            if ajax_layout = _find_ajax_layout(ajax_layout)
+              options[:layout] = ajax_layout.path_without_format_and_extension
+            end
+          end
         end
         render_without_ajax(options, extra_options, &block)
       end
@@ -129,7 +131,11 @@ module Ajax
         else
           layout_name = super
           if ajax_layout = _layout_for_ajax(layout_name)
-            ajax_layout.virtual_path
+            if ajax_layout = _find_ajax_layout(ajax_layout)
+              ajax_layout.virtual_path
+            else
+              layout_name
+            end
           else
             layout_name
           end
@@ -245,15 +251,20 @@ END
       ajax_layout = if ajax_layout.nil? && default.nil?
           nil
         elsif ajax_layout.nil? && !default.nil? # look for one with the default name in layouts/ajax
-          "layouts/ajax/#{default.sub(/layouts(\/)?/, '')}"
-        elsif ajax_layout && !(ajax_layout =~ /^layouts\/ajax/) # look for it in layouts/ajax
-          "layouts/ajax/#{ajax_layout}"
-        else # look as is
+          "ajax/#{default.sub(/layouts(\/)?/, '')}"
+        elsif ajax_layout.include?(?/) # path to specific layout
           ajax_layout
+        else # layout name, look in ajax/
+          "ajax/#{ajax_layout}"
         end
+      ajax_layout = ajax_layout =~ /\blayouts/ ? ajax_layout : "layouts/#{ajax_layout}" if ajax_layout
+      ajax_layout
+    end
+
+    def _find_ajax_layout(ajax_layout)
       Ajax.app.rails?(3) ? find_template(ajax_layout) : find_layout(ajax_layout, 'html') if !ajax_layout.nil?
     rescue ::ActionView::MissingTemplate
-      Ajax.logger.info("[ajax] no layout found in layouts/ajax.  Using #{default}.")
+      Ajax.logger.warn("[ajax] layout #{ajax_layout.inspect} not found.  Using default.")
       nil
     end
   end
