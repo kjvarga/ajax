@@ -39,7 +39,7 @@ module Ajax
       # layout and render that.  If it can't be found, the default layout
       # is used.
       def ajax_layout(template_name)
-        write_inheritable_attribute(:ajax_layout, template_name)
+        (self.is_a?(Class) ? self : self.class).write_inheritable_attribute(:ajax_layout, template_name)
       end
     end
 
