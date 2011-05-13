@@ -10,6 +10,14 @@ module Ajax
     initializer 'ajax.action_integration' do
       ActiveSupport.on_load :action_view do
         include Ajax::ActionView
+
+        self.class_eval do
+          def _render_layout_with_tracking(layout, locals, &block)
+            controller.instance_variable_set(:@_rendered_layout, layout)
+            _render_layout_without_tracking(layout, locals, &block)
+          end
+          alias_method_chain :_render_layout, :tracking
+        end
       end
       ActiveSupport.on_load :action_controller do
         include Ajax::ActionController

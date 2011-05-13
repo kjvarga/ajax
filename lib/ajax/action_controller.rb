@@ -154,7 +154,13 @@ module Ajax
     # +controller+ is the result of calling ActionController#controller_name, so
     # if your controller is ApplicationController the value will be <tt>'application'</tt>.
     def serialize_ajax_info
-      Ajax.set_header(response, :layout, Ajax.app.rails?(3) ? _layout : active_layout)
+      layout = if Ajax.app.rails?(3)
+          @_rendered_layout && @_rendered_layout.virtual_path
+        else
+          active_layout
+        end
+      layout.sub!(/^layouts\//, '') if layout
+      Ajax.set_header(response, :layout, layout)
       Ajax.set_header(response, :controller, self.class.controller_name)
       response.headers['Ajax-Info'] = Ajax.send(:serialize_hash, response.headers['Ajax-Info'])
     end
