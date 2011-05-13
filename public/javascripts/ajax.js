@@ -682,10 +682,12 @@ var Ajax = function(options) {
    */
   self.hideLoadingImage = function() {
     // check if a new request has already started
-    if (self.current_request && self.current_request.status == 0) {
-      console.log("[ajax] aborting hideLoadingImage.. ");
-      return;
-    }
+    try {
+      if (self.current_request && self.current_request.status == 0) {
+        console.log("[AJAX] aborting hideLoadingImage.. ");
+        return;
+      }
+    } catch(e) {}
     if (!self.show_loading_image) { return; }
     if (!self.hide_loading_image_callback) {
       $(document).unbind('mousemove', self.updateImagePosition);
