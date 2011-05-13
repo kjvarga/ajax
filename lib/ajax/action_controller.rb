@@ -126,7 +126,7 @@ module Ajax
       # Specialize the default layout finder.  Try to use a layout in layouts/ajax
       # as the default layout, if one exists.
       def _default_layout(require_layout = false)
-        if require_layout || !request.xhr? || !Ajax.is_enabled?
+        if !request.xhr? || !Ajax.is_enabled?
           super
         else
           layout_name = super
