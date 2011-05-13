@@ -12,11 +12,13 @@ module Ajax
         include Ajax::ActionView
 
         self.class_eval do
-          def _render_layout_with_tracking(layout, locals, &block)
-            controller.instance_variable_set(:@_rendered_layout, layout)
-            _render_layout_without_tracking(layout, locals, &block)
+          unless instance_methods.include?('_render_layout_with_tracking')
+            def _render_layout_with_tracking(layout, locals, &block)
+              controller.instance_variable_set(:@_rendered_layout, layout)
+              _render_layout_without_tracking(layout, locals, &block)
+            end
+            alias_method_chain :_render_layout, :tracking
           end
-          alias_method_chain :_render_layout, :tracking
         end
       end
       ActiveSupport.on_load :action_controller do

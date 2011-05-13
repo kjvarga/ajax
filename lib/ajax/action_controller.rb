@@ -123,22 +123,14 @@ module Ajax
         end
       end
 
-      # Specialize the default layout finder.  Try to use a layout in layouts/ajax
-      # as the default layout, if one exists.
-      def _default_layout(require_layout = false)
+
+      def _layout_for_option(name)
+        default = super
         if !request.xhr? || !Ajax.is_enabled?
-          super
+          default
         else
-          layout_name = super
-          if ajax_layout = _layout_for_ajax(layout_name)
-            if ajax_layout = _find_ajax_layout(ajax_layout)
-              ajax_layout.virtual_path
-            else
-              layout_name
-            end
-          else
-            layout_name
-          end
+          ajax_layout = _layout_for_ajax(default)
+          ajax_layout && template_exists?(ajax_layout) ? ajax_layout : default
         end
       end
     end
@@ -153,14 +145,17 @@ module Ajax
     #
     # +controller+ is the result of calling ActionController#controller_name, so
     # if your controller is ApplicationController the value will be <tt>'application'</tt>.
+    #
+    # +layout+ is the name of the layout without any path or extension.  So for example if
+    # layouts/simple.html.erb or layouts/ajax/simple.html.erb are rendered the
+    # value of +layout+ would be <tt>'simple'</tt> in both cases.
     def serialize_ajax_info
-      layout = if Ajax.app.rails?(3)
-          @_rendered_layout && @_rendered_layout.virtual_path
+      layout_name = if Ajax.app.rails?(3)
+          @_rendered_layout && @_rendered_layout.variable_name
         else
           active_layout
         end
-      layout.sub!(/^layouts\//, '') if layout
-      Ajax.set_header(response, :layout, layout)
+      Ajax.set_header(response, :layout, layout_name)
       Ajax.set_header(response, :controller, self.class.controller_name)
       response.headers['Ajax-Info'] = Ajax.send(:serialize_hash, response.headers['Ajax-Info'])
     end
@@ -257,7 +252,13 @@ END
       ajax_layout = if ajax_layout.nil? && default.nil?
           nil
         elsif ajax_layout.nil? && !default.nil? # look for one with the default name in layouts/ajax
-          "ajax/#{default.sub(/layouts(\/)?/, '')}"
+          if default =~ /^layouts\/ajax\//
+            default
+          elsif !(default =~ /^ajax\//)
+            "ajax/#{default.sub(/layouts(\/)?/, '')}"
+          else
+            default
+          end
         elsif ajax_layout.include?(?/) # path to specific layout
           ajax_layout
         else # layout name, look in ajax/
