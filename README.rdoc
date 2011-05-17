@@ -87,7 +87,7 @@ Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your 
 5. Include the JavaScript files in your application layout file:
 
      # app/views/layouts/application.html.erb
-     <%= javascript_include_tag 'jquery', 'jquery.json-2.2.min', 'jquery.address-1.3', 'ajax', 'application' %>
+     <%= javascript_include_tag 'jquery', 'jquery.json-2.2.min', 'jquery.address-1.4', 'ajax', 'application' %>
 
    While you are in this file, add a container element that will be the default container to receive content loaded via the Ajax framework.  Usually this is the main body of the page below the header.  For example:
 
@@ -273,7 +273,7 @@ You must be running <b>jQuery >= 1.4.2</b> to use this plugin.  Sorry, Prototype
 
 The following JavaScript libraries are required and included in the plugin:
 
-* {jQuery Address 1.3}[http://www.asual.com/jquery/address/]
+* {jQuery Address 1.4}[http://www.asual.com/jquery/address/]
 * jQuery JSON 2.2
 
 === Ruby and Rails:
