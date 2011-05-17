@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-context Ajax do
-  context "framework path" do
+describe Ajax do
+  describe "framework path" do
     it "should be /ajax/framework by default" do
       Ajax.framework_path.should_not be_nil
       Ajax.framework_path.should == '/ajax/framework'

@@ -24,16 +24,12 @@ end
 desc 'Default: run spec tests.'
 task :default => :spec
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/ajax/**/*_spec.rb', 'spec/rack-ajax/**/*_spec.rb']
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
+# Don't run spec/integration tests.  They are for your Rails application and require
+# rspec-rails.
+require "rspec/core/rake_task"
+RSpec::Core::RakeTask.new(:spec) do |spec|
+  spec.pattern = FileList['spec/ajax/**/*_spec.rb', 'spec/rack-ajax/**/*_spec.rb']
+  spec.rspec_opts = ['--backtrace']
 end
 
 namespace :release do

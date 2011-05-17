@@ -5,7 +5,7 @@ describe Ajax::Application do
     @app = Ajax::Application.new
   end
 
-  context "rails?" do
+  describe "rails?" do
     tests = {
       # version => [[arg, should return], ..]
       nil      => [[nil, true], [1, false], [2, false], [3, false]],
@@ -25,7 +25,7 @@ describe Ajax::Application do
     end
   end
 
-  context "root" do
+  describe "root" do
     it "should be set to the Rails root" do
       silence_warnings { Rails = mock(:root => Ajax.root) }
       Ajax.app.root.should == Rails.root

@@ -1,7 +1,7 @@
 # coding: utf-8
 require 'spec_helper'
 
-context 'Ajax::UrlHelpers' do
+describe 'Ajax::UrlHelpers' do
   DOMAINS = %w[musicsocial.com.local altnet.com amusicstreamingservice.com stage.altnet.com rails1.creagency.com.au]
 
   describe "(URL) hashed_url_from_traditional" do

@@ -8,7 +8,7 @@ end
 require 'rake'
 load(Ajax.root + 'tasks/ajax_tasks.rake')
 
-context 'task' do
+describe 'task' do
   before :all do
     @tmp = Ajax.root + '../../tmp'
     silence_warnings { Rails = mock(:root => @tmp) }
@@ -23,7 +23,7 @@ context 'task' do
     Rails.root.should == @tmp
   end
 
-  context 'install' do
+  describe 'install' do
     it "should install files" do
       Rake::Task['ajax:install'].invoke
       INSTALL_FILES.each do |file|
@@ -32,8 +32,8 @@ context 'task' do
     end
   end
 
-  context 'update' do
-    context 'javascript' do
+  describe 'update' do
+    describe 'javascript' do
       it "should update files" do
         Rake::Task['ajax:update:javascript'].invoke
         UPDATE_JAVASCRIPT_FILES.each do |file|
