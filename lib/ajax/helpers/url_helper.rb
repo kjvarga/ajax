@@ -36,6 +36,11 @@ module Ajax
         hashed_url
       end
 
+      def traditional_url_from_escaped_fragment(url, escaped_fragment)
+        fragment = URI.decode(escaped_fragment)
+        url_host(url) + strip_slashes('/' + fragment)
+      end
+
       protected
 
       # Globally replace double slashes (//) with single slashes (/) and return

@@ -12,6 +12,7 @@ module Rack
       # easier to introspect the headers.
       def initialize(env)
         @env = env
+        @env['rack.input'] = '' # Prevents RuntimeError: Missing rack.input
         @request = Rack::Request.new(env)
       end
 
@@ -37,6 +38,10 @@ module Rack
         @url_is_root ||= ::Ajax.url_is_root?(@env['PATH_INFO'])
       end
 
+      def snapshot_request?
+        !!@request['_escaped_fragment_']
+      end
+
       # Return a boolean indicating if the request is from a robot.
       #
       # Inspect the headers first - if there are any - so we don't
@@ -54,6 +59,11 @@ module Rack
           end
         ::Ajax.set_header(@env, :robot, @user_is_robot)
         @user_is_robot
+      end
+
+      # Google snapshot request
+      def rewrite_to_traditional_url_from_escaped_fragment
+        rewrite(::Ajax.traditional_url_from_escaped_fragment(@env['REQUEST_URI'], @request['_escaped_fragment_']))
       end
 
       def rewrite_to_traditional_url_from_fragment

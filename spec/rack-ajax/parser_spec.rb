@@ -55,7 +55,7 @@ describe Rack::Ajax::Parser, :type => :integration do
     end
     should_redirect_to('/#!/Akon', 302)
   end
-  
+
   it "should rewrite to traditional url from fragment" do
     call_rack('/Beyonce?page=1#/Akon?query2') do
       rewrite_to_traditional_url_from_fragment
@@ -69,7 +69,7 @@ describe Rack::Ajax::Parser, :type => :integration do
     end
     should_rewrite_to('/Akon?query2')
   end
-  
+
   it "should return a valid rack response" do
     call_rack('/') { rack_response('test') }
     should_respond_with('test')
@@ -92,6 +92,34 @@ describe Rack::Ajax::Parser, :type => :integration do
       @env['PATH_INFO'].should == '/'
       @env['QUERY_STRING'].should be_nil
       @env['REQUEST_URI'].should == 'http://example.com/#/users?one=two'
+    end
+  end
+
+  describe "snapshot request" do
+    it "should detect a request for a snapshot" do
+      call_rack('/?_escaped_fragment_=artists') { snapshot_request? }.should be_true
+      call_rack('/?escaped_fragment=artists') { snapshot_request? }.should be_false
+    end
+
+    it "should rewrite to traditional url from escaped fragment" do
+      call_rack('/xxx?_escaped_fragment_=artists') do
+        rewrite_to_traditional_url_from_escaped_fragment
+      end
+      should_rewrite_to('/artists')
+    end
+
+    it "should rewrite to traditional url from escaped fragment" do
+      call_rack('/?_escaped_fragment_=/artists/') do
+        rewrite_to_traditional_url_from_escaped_fragment
+      end
+      should_rewrite_to('/artists/')
+    end
+
+    it "should decode the escaped fragment" do
+      call_rack('/?_escaped_fragment_=/artists%26aliens') do
+        rewrite_to_traditional_url_from_escaped_fragment
+      end
+      should_rewrite_to('/artists&aliens')
     end
   end
 end
