@@ -63,7 +63,7 @@ module Rack
       # Redirect to a hashed URL consisting of the fragment portion of the current URL.
       # This is an edge case.  What can theoretically happen is a user visits a
       # bookmarked URL, then browses via AJAX and ends up with a URL like
-      # '/Beyonce#/Akon'.  Redirect them to '/#/Akon'.
+      # '/Beyonce#/Akon'.  Redirect them to '/#!/Akon'.
       def redirect_to_hashed_url_from_fragment
         r302(::Ajax.hashed_url_from_fragment(@env['REQUEST_URI']))
       end

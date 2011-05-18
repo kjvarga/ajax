@@ -10,9 +10,7 @@ module Rack
       #       # your code
       #     end
       #
-      # Note: User agents never send the hashed part of the URL, meaning some of
-      # the conditions below will never be true, but I've included them for
-      # completeness.
+      # Note: User agents never send the hashed part of the URL.
       def default_decision_tree
         @@default_decision_tree ||= Proc.new do
           ::Ajax.logger.debug("[ajax] Ajax-Info #{@env['Ajax-Info'].inspect}")

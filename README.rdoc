@@ -116,7 +116,7 @@ Run <tt>script/plugin install http://github.com/kjvarga/ajax.git</tt> from your 
 
 7. Ajax should now be installed and configured and ready to handle requests.  Start your Rails server, open your favorite browser and load the home page.  Using the browser's developer tools take a look at the console.  You should not see any JavaScript errors.
 
-   If everything is working correctly when you load the root url <tt>/</tt> the URL should change to <tt>/#</tt> and you should see some output in the console like:
+   If everything is working correctly when you load the root url <tt>/</tt> the URL should change to <tt>/#!</tt> and you should see some output in the console like:
 
     [ajax] loadPage /
     GET http://localhost:3000/?_=1304973841796
@@ -225,7 +225,7 @@ But if we do that, the URL will never change and we will have no history, becaus
 
 So now your traditional links auto-magically load content via AJAX into a page container and update the browser URL with the new URL.  You have all the benefits of AJAX as well as history and link bookmarkability.
 
-Where before you would have seen something like <tt>http://example.com/the-beatles/history</tt>, now you would see <tt>http://example.com/#/the-beatles/history</tt>.  Notice the <tt>#/</tt>?
+Where before you would have seen something like <tt>http://example.com/the-beatles/history</tt>, now you would see <tt>http://example.com/#!/the-beatles/history</tt>.  Notice the <tt>#/</tt>?
 
 === How does it work?
 
@@ -237,7 +237,7 @@ In order to load the correct page we must first render a framework page with acc
 
 === An Example User Interaction
 
-1. User pastes http://example.com/#/beyonce/albums into a browser.
+1. User pastes http://example.com/#!/beyonce/albums into a browser.
 2. Server receives request for http://example.com/ and renders the framework page.
 4. AJAX request for http://example.com/beyonce/albums is initiated by client-side JavaScript, and received by the server.
 5. Server renders http://example.com/beyonce/albums.

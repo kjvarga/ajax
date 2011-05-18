@@ -278,6 +278,7 @@ var Ajax = function(options) {
 
     // Configure jQuery Address
     $.address.history(true);
+    $.address.crawlable(true);
     $.address.change = self.addressChanged;
 
     // Bind a live event to all ajax-enabled links
@@ -500,7 +501,7 @@ var Ajax = function(options) {
       ajax_url = ajax_url.replace(/(https?:\/\/[^\/]*\/(.*))/, '$2');
     }
     if (document.location.pathname != '/') {
-      var url = ('/#/' + ajax_url).replace(/\/\//, '/');
+      var url = ('/#!/' + ajax_url).replace(/\/\//, '/');
       //console.log('linkClicked 1: going to ' + url);
       document.location.href = url;
     } else {

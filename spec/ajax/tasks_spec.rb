@@ -11,7 +11,7 @@ load(Ajax.root + 'tasks/ajax_tasks.rake')
 describe 'task' do
   before :all do
     @tmp = Ajax.root + '../../tmp'
-    silence_warnings { Rails = mock(:root => @tmp) }
+    silence_warnings { Rails = stub(:root => @tmp) }
   end
 
   before :each do

@@ -46,9 +46,16 @@ describe Rack::Ajax::Parser, :type => :integration do
     call_rack('/Beyonce?page=1#/Akon') do
       redirect_to_hashed_url_from_fragment
     end
-    should_redirect_to('/#/Akon', 302)
+    should_redirect_to('/#!/Akon', 302)
   end
 
+  it "should redirect to hashed url from fragment with !" do
+    call_rack('/Beyonce?page=1#!/Akon') do
+      redirect_to_hashed_url_from_fragment
+    end
+    should_redirect_to('/#!/Akon', 302)
+  end
+  
   it "should rewrite to traditional url from fragment" do
     call_rack('/Beyonce?page=1#/Akon?query2') do
       rewrite_to_traditional_url_from_fragment
@@ -56,6 +63,13 @@ describe Rack::Ajax::Parser, :type => :integration do
     should_rewrite_to('/Akon?query2')
   end
 
+  it "should rewrite to traditional url from fragment with !" do
+    call_rack('/Beyonce?page=1#!/Akon?query2') do
+      rewrite_to_traditional_url_from_fragment
+    end
+    should_rewrite_to('/Akon?query2')
+  end
+  
   it "should return a valid rack response" do
     call_rack('/') { rack_response('test') }
     should_respond_with('test')

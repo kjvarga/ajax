@@ -17,7 +17,7 @@ describe Ajax::Application do
 
     tests.each do |version, results|
       it "should identify #{version.inspect} correctly" do
-        silence_warnings { Rails = mock(:version => version) }
+        silence_warnings { Rails = stub(:version => version) }
         results.each do |arg, value|
           @app.rails?(arg).should == value
         end
@@ -27,7 +27,7 @@ describe Ajax::Application do
 
   describe "root" do
     it "should be set to the Rails root" do
-      silence_warnings { Rails = mock(:root => Ajax.root) }
+      silence_warnings { Rails = stub(:root => Ajax.root) }
       Ajax.app.root.should == Rails.root
     end
   end
