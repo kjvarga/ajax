@@ -14,8 +14,11 @@ module Rack
       def default_decision_tree
         @@default_decision_tree ||= Proc.new do
           ::Ajax.logger.debug("[ajax] Ajax-Info #{@env['Ajax-Info'].inspect}")
-
-          if !::Ajax.exclude_path?(@env['PATH_INFO'] || @env['REQUEST_URI'])
+          if snapshot_request?
+            user_is_robot? # set the robot header
+            rewrite_to_traditional_url_from_escaped_fragment
+          elsif !::Ajax.exclude_path?(@env['PATH_INFO'] || @env['REQUEST_URI'])
+            user_is_robot? # set the robot header
             if ajax_request?
               if hashed_url? # the browser never sends the hashed part
                 rewrite_to_traditional_url_from_fragment
