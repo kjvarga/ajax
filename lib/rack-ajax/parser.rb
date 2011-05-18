@@ -43,20 +43,29 @@ module Rack
       end
 
       # Return a boolean indicating if the request is from a robot.
+      # If the request is a snapshot request, the user is a robot.
       #
-      # Inspect the headers first - if there are any - so we don't
-      # look in the database unneccessarily.
+      # Inspects the request headers to identify robots by their
+      # User-Agent string.
       #
-      # Sets the result in a header {Ajax-Info}[user_is_robot] so we
-      # don't have to repeat this check in the application.
+      # Sets the result in a header {Ajax-Info}[robot] so that
+      # it is available to your application.
       def user_is_robot?
         return @user_is_robot if instance_variable_defined?(:@user_is_robot)
-        @user_is_robot =
-          if @request.user_agent.nil?
+        value =
+          if snapshot_request?
+            true
+          elsif @request.user_agent.nil?
             false
           else
             ::Ajax.is_robot?(@request.user_agent)
           end
+        self.user_is_robot = value
+      end
+
+      # Set a header indicating whether the current user is a robot
+      def user_is_robot=(value)
+        @user_is_robot = value
         ::Ajax.set_header(@env, :robot, @user_is_robot)
         @user_is_robot
       end
