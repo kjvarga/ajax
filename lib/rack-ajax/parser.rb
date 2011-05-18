@@ -12,7 +12,6 @@ module Rack
       # easier to introspect the headers.
       def initialize(env)
         @env = env
-        @env['rack.input'] = '' # Prevents RuntimeError: Missing rack.input
         @request = Rack::Request.new(env)
       end
 

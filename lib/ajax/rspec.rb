@@ -1,6 +1,9 @@
 require 'ajax/rspec/extension'
 require 'ajax/rspec/helpers'
+require 'ajax/rspec/fix_parser_for_tests'
 
+# Require this file after loading RSpec.  It is not required for you.
+#
 # RSpec integration.  Add a before filter to disable Ajax before all tests.
 # Make the methods in Ajax::RSpec::Extension available in your example groups.
 #
