@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ajax}
-  s.version = "1.1.8"
+  s.version = "1.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Karl Varga"]
-  s.date = %q{2011-05-18}
+  s.date = %q{2011-05-19}
   s.description = %q{Augment a traditional Rails application with a completely AJAX frontend, while transparently handling issues important to both the enterprise and end users, such as testing, SEO and browser history.}
   s.email = %q{kjvarga@gmail.com}
   s.extra_rdoc_files = [
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
      "lib/ajax/routes.rb",
      "lib/ajax/rspec.rb",
      "lib/ajax/rspec/extension.rb",
+     "lib/ajax/rspec/fix_parser_for_tests.rb",
      "lib/ajax/rspec/helpers.rb",
      "lib/ajax/tasks.rb",
      "lib/rack-ajax.rb",
@@ -47,8 +48,8 @@ Gem::Specification.new do |s|
      "lib/rack-ajax/parser.rb",
      "public/images/ajax-loading.gif",
      "public/javascripts/ajax.js",
-     "public/javascripts/jquery.address-1.3.js",
-     "public/javascripts/jquery.address-1.3.min.js",
+     "public/javascripts/jquery.address-1.4.js",
+     "public/javascripts/jquery.address-1.4.min.js",
      "public/javascripts/jquery.json-2.2.js",
      "public/javascripts/jquery.json-2.2.min.js",
      "rails/init.rb",
