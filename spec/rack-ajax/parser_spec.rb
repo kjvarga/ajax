@@ -61,7 +61,7 @@ describe Rack::Ajax::Parser, :type => :integration do
     should_respond_with('test')
   end
 
-  describe "rewrite", :focus => true do
+  describe "rewrite" do
     before :each do
       @env = {}
     end
