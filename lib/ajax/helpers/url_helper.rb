@@ -41,14 +41,6 @@ module Ajax
         url_host(url) + strip_slashes('/' + fragment)
       end
 
-      protected
-
-      # Globally replace double slashes (//) with single slashes (/) and return
-      # the result.
-      def strip_slashes(str)
-        str.gsub(/\/\//, '/')
-      end
-
       # Return the fragment part of the URL.  If the hashed part starts with !
       # the exclamation mark is stripped.  If there is no fragment, returns the
       # empty string.
@@ -61,6 +53,14 @@ module Ajax
       # Uses +url_fragment*.
       def normalized_url_fragment(url)
         '/'+ url_fragment(url).sub(/^\!?\/*/, '')
+      end
+            
+      protected
+
+      # Globally replace double slashes (//) with single slashes (/) and return
+      # the result.
+      def strip_slashes(str)
+        str.gsub(/\/\//, '/')
       end
 
       def encode_and_parse_url(url)

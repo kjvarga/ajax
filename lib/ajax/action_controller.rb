@@ -227,7 +227,7 @@ END
         session[:redirected_to] = url
         if request.xhr? && Ajax.is_hashed_url?(url)
           Ajax.logger.info("[ajax] detecting we are xhr. soft redirect")
-          redirect_path = URI.parse(url).select(:fragment).first
+          redirect_path = Ajax.normalized_url_fragment(url)
           Ajax.logger.info("[ajax] redirect path is #{redirect_path}")
           Ajax.set_header(response, :soft_redirect, redirect_path)
           render :layout => false, :text => <<-END
