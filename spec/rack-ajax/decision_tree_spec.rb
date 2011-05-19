@@ -20,9 +20,9 @@ describe "decision tree" do
       should_set_ajax_request_header('robot', true)
     end
 
-    it "the user should be a robot" do
+    it "should set the snapshot_request header" do
       call_rack('/?_escaped_fragment_=artists')
-      should_set_ajax_request_header('robot', true)
+      should_set_ajax_request_header('snapshot_request', true)
     end
 
     describe "on excluded paths" do

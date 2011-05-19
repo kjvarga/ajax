@@ -38,7 +38,14 @@ module Rack
       end
 
       def snapshot_request?
-        !!@request['_escaped_fragment_']
+        self.snapshot_request = !!@request['_escaped_fragment_']
+      end
+
+      # Set a header indicating whether the current request is a snapshot request
+      def snapshot_request=(value)
+        @snapshot_request = value
+        ::Ajax.set_header(@env, :snapshot_request, @snapshot_request)
+        @snapshot_request
       end
 
       # Return a boolean indicating if the request is from a robot.
