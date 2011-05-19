@@ -1,37 +1,26 @@
 # coding: utf-8
 require 'spec_helper'
 
-# A simple container class that makes some protected helpers methods
-# public so they can be tested more easily.
-class Container
-  include Ajax::Helpers::UrlHelper
-  public :url_fragment, :normalized_url_fragment
-end
-
-describe 'Ajax::UrlHelpers', :focus => true do
-  before :all do
-    @c = Container.new
-  end
-
+describe 'Ajax::UrlHelpers' do
   DOMAINS = %w[musicsocial.com.local altnet.com amusicstreamingservice.com stage.altnet.com rails1.creagency.com.au]
 
   describe "url_fragment" do
     it "should return the fragment" do
-      @c.url_fragment('/Beyonce#abc').should == 'abc'
-      @c.url_fragment('/Beyonce#/abc').should == '/abc'
-      @c.url_fragment('/Beyonce#/abc').should == '/abc'
+      Ajax.url_fragment('/Beyonce#abc').should == 'abc'
+      Ajax.url_fragment('/Beyonce#/abc').should == '/abc'
+      Ajax.url_fragment('/Beyonce#/abc').should == '/abc'
     end
   end
 
-  describe "normalized_url_fragment" do
+  describe "Ajax.normalized_url_fragment" do
     it "should return the fragment" do
-      @c.normalized_url_fragment('/Beyonce#abc').should == '/abc'
-      @c.normalized_url_fragment('/Beyonce#/abc').should == '/abc'
-      @c.normalized_url_fragment('/Beyonce#/abc').should == '/abc'
-      @c.normalized_url_fragment('/Beyonce#!/abc').should == '/abc'
-      @c.normalized_url_fragment('/Beyonce#!//abc').should == '/abc'
-      @c.normalized_url_fragment('/Beyonce#!/?abc').should == '/?abc'
-      @c.normalized_url_fragment('/Beyonce#/!/abc').should == '/!/abc'
+      Ajax.normalized_url_fragment('/Beyonce#abc').should == '/abc'
+      Ajax.normalized_url_fragment('/Beyonce#/abc').should == '/abc'
+      Ajax.normalized_url_fragment('/Beyonce#/abc').should == '/abc'
+      Ajax.normalized_url_fragment('/Beyonce#!/abc').should == '/abc'
+      Ajax.normalized_url_fragment('/Beyonce#!//abc').should == '/abc'
+      Ajax.normalized_url_fragment('/Beyonce#!/?abc').should == '/?abc'
+      Ajax.normalized_url_fragment('/Beyonce#/!/abc').should == '/!/abc'
     end
   end
 
