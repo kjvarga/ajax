@@ -55,6 +55,7 @@ module Rack
           end
         end
       end
+      module_function :default_decision_tree
     end
   end
 end

@@ -6,8 +6,6 @@ require 'yaml/encoding' unless RUBY_VERSION.to_f == 1.9
 
 module Rack
   class Ajax
-    extend Rack::Ajax::DecisionTree
-
     cattr_accessor :decision_tree
     attr_accessor :user, :request, :params
 
@@ -17,10 +15,14 @@ module Rack
     # To integrate Rack::Ajax into your app you should store the decision
     # tree in a class-attribute <tt>decision_tree</tt>.
     #
-    # The <tt>default_decision_tree</tt> is used if no other is provided.
+    # The <tt>Rack::Ajax::DecisionTree.default_decision_tree</tt> is used if no other is provided.
     def initialize(app)
       @app = app
-      @decision_tree = block_given? ? Proc.new : (self.class.decision_tree || self.class.default_decision_tree)
+      @decision_tree = Proc.new if block_given?
+    end
+
+    def decision_tree
+      @decision_tree ||= (self.class.decision_tree || Rack::Ajax::DecisionTree.default_decision_tree)
     end
 
     def call(env)
@@ -29,7 +31,7 @@ module Rack
       # Parse the Ajax-Info header
       env["Ajax-Info"] = ::Ajax.unserialize_hash(env['HTTP_AJAX_INFO'])
       @parser = Parser.new(env)
-      rack_response = @parser.instance_eval(&@decision_tree)
+      rack_response = @parser.instance_eval(&decision_tree)
 
       # Clear the value of session[:redirected_to]
       unless env['rack.session'].nil?
