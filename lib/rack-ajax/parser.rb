@@ -1,3 +1,5 @@
+require 'uri'
+
 # The <tt>rewrite</tt> and <tt>redirect</tt> methods are terminal methods meaning
 # that they return a Rack response or modify the Rack request.
 #
@@ -82,16 +84,12 @@ module Rack
         rack_response('Redirecting...', 302, 'Location' => url)
       end
 
-      def rewrite(interpreted_to)
-        @env['REQUEST_URI'] = interpreted_to
-        if q_index = interpreted_to.index('?')
-          @env['PATH_INFO'] = interpreted_to[0..q_index-1]
-          @env['QUERY_STRING'] = interpreted_to[q_index+1..interpreted_to.size-1]
-        else
-          @env['PATH_INFO'] = interpreted_to
-          @env['QUERY_STRING'] = ''
-        end
-
+      # Expects a traditional URL.  Any fragment is ignored.
+      def rewrite(url)
+        uri = URI(url)
+        @env['REQUEST_URI'] =  url
+        @env["PATH_INFO"] =    uri.path
+        @env["QUERY_STRING"] = uri.query
         nil # fallthrough to app
       end
 

@@ -60,4 +60,24 @@ describe Rack::Ajax::Parser, :type => :integration do
     call_rack('/') { rack_response('test') }
     should_respond_with('test')
   end
+
+  describe "rewrite", :focus => true do
+    before :each do
+      @env = {}
+    end
+
+    it "should set the HTTP headers correctly" do
+      Rack::Ajax::Parser.new(@env).send(:rewrite, 'http://example.com/users?one=two')
+      @env['PATH_INFO'].should == '/users'
+      @env['REQUEST_URI'].should == 'http://example.com/users?one=two'
+      @env['QUERY_STRING'].should == 'one=two'
+    end
+
+    it "should ignore the fragment when setting PATH_INFO" do
+      Rack::Ajax::Parser.new(@env).send(:rewrite, 'http://example.com/#/users?one=two')
+      @env['PATH_INFO'].should == '/'
+      @env['QUERY_STRING'].should be_nil
+      @env['REQUEST_URI'].should == 'http://example.com/#/users?one=two'
+    end
+  end
 end
