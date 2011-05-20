@@ -27,7 +27,7 @@ After getting the Gem installed, take a look at <b>Getting Started</b> for more 
 
 === Rails 3
 
-Add the gem to your <tt>Gemspec</tt>:
+Add the gem to your <tt>Gemfile</tt>:
 
    gem 'ajax'
 
