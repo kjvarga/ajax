@@ -30,12 +30,22 @@ module Helpers
   end
 
   module OptionHelpers
+    # Set one or more options from the +opts+ hash on the Ajax object
+    # and return an array of their original values.
+    def set_option(opts)
+      opts.collect do |option, value|
+        original = Ajax.send("#{option}?")
+        Ajax.send("#{option}=", value)
+        original
+      end
+    end
+
     # Sets the options on Ajax, yields to the block and then restores the original
     # options after the block completes.
     def with_option(opts, yields=nil, &block)
-      original = opts.collect { |option, value| Ajax.send("#{option}?") }
-      yields ? yield(yields) : yield
-      opts.keys.zip(original).each { |option, value| Ajax.send("#{option}=", value) }
+      original = set_option(opts)
+      yields.nil? ? yield : yield(yields)
+      set_option(opts.keys.zip(original))
     end
 
     # Pass an array of values for each option.  Each value is set on the
