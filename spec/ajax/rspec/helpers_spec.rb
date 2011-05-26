@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Helpers::OptionHelpers do
+describe Ajax::RSpec::OptionHelpers do
 
   describe_context = self
 

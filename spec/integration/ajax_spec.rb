@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'uri'
 require 'ajax/rspec'
 
-include Ajax::RSpec::Helpers
+include Ajax::RSpec::RequestHelpers
 
 # Test the Rack::Ajax handling of urls according to our block from
 # <tt>config/initializers/ajax.rb</tt>

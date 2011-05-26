@@ -14,6 +14,7 @@ module Ajax::RSpec
     if defined?(::RSpec)
       ::RSpec.configure do |c|
         c.include(Ajax::RSpec::Extension)
+        c.include(Ajax::RSpec::Helpers)
         c.before :all do
           Ajax.enabled = false
         end

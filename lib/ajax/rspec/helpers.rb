@@ -3,6 +3,14 @@ require 'uri'
 module Ajax
   module RSpec
     module Helpers
+      def self.included(receiver)
+        receiver.send(:include, ::Ajax::RSpec::FileHelpers)
+        receiver.send(:include, ::Ajax::RSpec::OptionHelpers)
+        receiver.send(:extend,  ::Ajax::RSpec::OptionHelpers)
+      end
+    end
+
+    module RequestHelpers
       def create_app
         @app = Class.new { def call(env); true; end }.new
       end
@@ -88,6 +96,62 @@ module Ajax
 
       def response_body_as_hash
         @response_body_as_hash ||= YAML.load(response_body)
+      end
+    end
+
+    module FileHelpers
+      def files_should_be_identical(first, second)
+        identical_files?(first, second).should be(true)
+      end
+
+      def files_should_not_be_identical(first, second)
+        identical_files?(first, second).should be(false)
+      end
+
+      def file_should_exist(file)
+        File.exists?(file).should be(true)
+      end
+
+      def file_should_not_exist(file)
+        File.exists?(file).should be(false)
+      end
+
+      def identical_files?(first, second)
+        open(second, 'r').read.should == open(first, 'r').read
+      end
+    end
+
+    module OptionHelpers
+      # Set one or more options from the +opts+ hash on the Ajax object
+      # and return an array of their original values.
+      def set_option(opts)
+        opts.collect do |option, value|
+          original = Ajax.send("#{option}?")
+          Ajax.send("#{option}=", value)
+          original
+        end
+      end
+
+      # Sets the options on Ajax, yields to the block and then restores the original
+      # options after the block completes.
+      def with_option(opts, yields=nil, &block)
+        original = set_option(opts)
+        yields.nil? ? yield : yield(yields)
+        set_option(opts.keys.zip(original))
+      end
+
+      # Pass an array of values for each option.  Each value is set on the
+      # Ajax object before yielding to the block.
+      #
+      # Pass an array of values to yield to the block in +yields+.  If it's empty,
+      # no value will be yielded.
+      def with_each_option(opts, yields=[], &block)
+        until opts.values.first.empty?
+          with_option(opts.inject({}) do |hash, tuple|
+            hash[tuple.first] = opts[tuple.first].shift
+            hash
+          end, yields.shift, &block)
+        end
       end
     end
   end
