@@ -78,14 +78,14 @@ module Ajax
   # URLs.
   #
   # Off by default.
-  def self.google_crawlable?
-    !!@google_crawlable
+  def self.crawlable?
+    !!@crawlable
   end
 
   # Set to true to enable Google crawlable URLS i.e. /#!/.
   # The fragment must start with an exclamation point.
-  def self.google_crawlable=(value)
-    @google_crawlable = !!value
+  def self.crawlable=(value)
+    @crawlable = !!value
   end
 
   # Return a boolean indicating whether the plugin is being mock tested.

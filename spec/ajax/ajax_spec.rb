@@ -27,14 +27,14 @@ describe Ajax do
 
   describe "google crawlable" do
     it "should be off by default" do
-      Ajax.google_crawlable?.should be_false
+      Ajax.crawlable?.should be_false
     end
 
     it "should be settable" do
-      Ajax.google_crawlable = true
-      Ajax.google_crawlable?.should be_true
-      Ajax.google_crawlable = false
-      Ajax.google_crawlable?.should be_false
+      Ajax.crawlable = true
+      Ajax.crawlable?.should be_true
+      Ajax.crawlable = false
+      Ajax.crawlable?.should be_false
     end
   end
 end

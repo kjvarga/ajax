@@ -26,14 +26,14 @@ describe Ajax::Helpers::UrlHelper do
     end
   end
 
-  [[false, '/#/'], [true, '/#!/']].each do |google_crawlable, fragment|
-    describe "when #{google_crawlable ? 'not' : ''} google crawlable" do
+  [[false, '/#/'], [true, '/#!/']].each do |crawlable, fragment|
+    describe "when #{crawlable ? 'not' : ''} google crawlable" do
       before :all do
-        @original ||= set_option(:google_crawlable => google_crawlable)
+        @original ||= set_option(:crawlable => crawlable)
       end
 
       after :all do
-        set_option(:google_crawlable => @original.first)
+        set_option(:crawlable => @original.first)
       end
 
       describe "hashed_url_from_traditional" do

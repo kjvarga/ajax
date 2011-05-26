@@ -104,7 +104,7 @@ describe 'Rack::Ajax' do
       describe "non-root url" do
         it "should redirect to hashed part at root" do
           get('/Akon/?query1#/Beyonce?query2')
-          should_redirect_to('/#!/Beyonce?query2')
+          should_redirect_to(Ajax.fragment_string + 'Beyonce?query2')
         end
       end
 
@@ -128,7 +128,7 @@ describe 'Rack::Ajax' do
 
       it "should redirect GET request" do
         get('/Beyonce')
-        should_redirect_to('/#!/Beyonce')
+        should_redirect_to(Ajax.fragment_string + 'Beyonce')
       end
 
       it "should not modify non-GET request" do

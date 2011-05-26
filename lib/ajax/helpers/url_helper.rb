@@ -2,10 +2,10 @@ module Ajax
   module Helpers
     module UrlHelper
       # Return the URL fragment to use when building URLs, including slashes.
-      # E.g. '/#/' for a traditional fragment.  Depends on the Ajax.google_crawlable?
+      # E.g. '/#/' for a traditional fragment.  Depends on the Ajax.crawlable?
       # setting.
       def fragment_string
-        Ajax.google_crawlable? ? '/#!/' : '/#/'
+        Ajax.crawlable? ? '/#!/' : '/#/'
       end
 
       # Return a boolean indicating whether the given URL points to the

@@ -187,6 +187,10 @@ var AjaxAssets = function(array, type) {
  *    <tt>default_container</tt>  string jQuery selector of the default
  *      container element to receive content.
  *
+ *    <tt>crawlable</tt>  boolean indicating whether to enable
+ *      Google-crawlable URLs.  Default is false.  Google-crawlable URLs
+ *      have a hash fragment like #!/.
+ *
  *    <tt>lazy_load_assets</tt>  boolean indicating whether to enable
  *      lazy loading assets.  If this is disabled, callbacks will be
  *      executed immediately.
@@ -257,6 +261,7 @@ var Ajax = function(options) {
     callbacks: [],
     loaded: false,
     lazy_load_assets: false,
+    crawlable: false,
     current_request: undefined,
 
     // For initial position of the loading icon.  Often the mouse does not
@@ -278,7 +283,7 @@ var Ajax = function(options) {
 
     // Configure jQuery Address
     $.address.history(true);
-    $.address.crawlable(true);
+    $.address.crawlable(self.crawlable);
     $.address.change = self.addressChanged;
 
     // Bind a live event to all ajax-enabled links
@@ -501,7 +506,7 @@ var Ajax = function(options) {
       ajax_url = ajax_url.replace(/(https?:\/\/[^\/]*\/(.*))/, '$2');
     }
     if (document.location.pathname != '/') {
-      var url = ('/#!/' + ajax_url).replace(/\/\//, '/');
+      var url = ((self.crawlable ? '/#!/' : '/#/') + ajax_url).replace(/\/\//, '/');
       //console.log('linkClicked 1: going to ' + url);
       document.location.href = url;
     } else {

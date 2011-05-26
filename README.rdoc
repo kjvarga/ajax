@@ -10,6 +10,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
+* v1.2.1: Make Google-crawlable URLs configurable and default it off for backwards compatibility; Snapshot requests are always supported regardless of the value of </tt>crawlable</tt>.
 * v1.2.0: Support Google-crawlable URLs by default
 * v1.1.8: Fix redirect issue caused by setting bad HTTP headers in URL rewrite
 * v1.1.7: Fix layout handling for Rails 3
