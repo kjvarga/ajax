@@ -32,10 +32,24 @@ module Helpers
   module OptionHelpers
     # Sets the options on Ajax, yields to the block and then restores the original
     # options after the block completes.
-    def with_options(opts, &block)
+    def with_option(opts, yields=nil, &block)
       original = opts.collect { |option, value| Ajax.send("#{option}?") }
-      yield
+      yields ? yield(yields) : yield
       opts.keys.zip(original).each { |option, value| Ajax.send("#{option}=", value) }
+    end
+
+    # Pass an array of values for each option.  Each value is set on the
+    # Ajax object before yielding to the block.
+    #
+    # Pass an array of values to yield to the block in +yields+.  If it's empty,
+    # no value will be yielded.
+    def with_each_option(opts, yields=[], &block)
+      until opts.values.first.empty?
+        with_option(opts.inject({}) do |hash, tuple|
+          hash[tuple.first] = opts[tuple.first].shift
+          hash
+        end, yields.shift, &block)
+      end
     end
   end
 
@@ -43,5 +57,6 @@ module Helpers
     receiver.send(:include, FileHelpers)
     receiver.send(:include, ResponseHelpers)
     receiver.send(:include, OptionHelpers)
+    receiver.send(:extend, OptionHelpers)
   end
 end
