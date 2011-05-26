@@ -25,7 +25,16 @@ describe Ajax do
     Ajax.app.should be_a(Ajax::Application)
   end
 
-  it "google crawlable should be off by default" do
-    Ajax.google_crawlable?.should be_false
+  describe "google crawlable" do
+    it "should be off by default" do
+      Ajax.google_crawlable?.should be_false
+    end
+
+    it "should be settable" do
+      Ajax.google_crawlable = true
+      Ajax.google_crawlable?.should be_true
+      Ajax.google_crawlable = false
+      Ajax.google_crawlable?.should be_false
+    end
   end
 end

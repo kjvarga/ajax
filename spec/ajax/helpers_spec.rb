@@ -1,7 +1,9 @@
 # coding: utf-8
 require 'spec_helper'
 
-describe 'Ajax::UrlHelpers' do
+
+
+describe Ajax::Helpers::UrlHelper do
   DOMAINS = %w[musicsocial.com.local altnet.com amusicstreamingservice.com stage.altnet.com rails1.creagency.com.au]
 
   describe "url_fragment" do
@@ -12,7 +14,7 @@ describe 'Ajax::UrlHelpers' do
     end
   end
 
-  describe "Ajax.normalized_url_fragment" do
+  describe "normalized_url_fragment" do
     it "should return the fragment" do
       Ajax.normalized_url_fragment('/Beyonce#abc').should == '/abc'
       Ajax.normalized_url_fragment('/Beyonce#/abc').should == '/abc'
@@ -24,62 +26,74 @@ describe 'Ajax::UrlHelpers' do
     end
   end
 
-  describe "(URL) hashed_url_from_traditional" do
-    it "should handle a query string" do
-      Ajax.hashed_url_from_traditional('/Beyonce?one=1').should == '/#!/Beyonce?one=1'
-    end
+  [[false, '/#/'], [true, '/#!/']].each do |google_crawlable, fragment|
+    describe "when #{google_crawlable ? 'not' : ''} google crawlable" do
+      before :all do
+        @original ||= set_option(:google_crawlable => google_crawlable)
+      end
 
-    it "should ignore the fragment" do
-      Ajax.hashed_url_from_traditional('/Beyonce?one=1#fragment').should == '/#!/Beyonce?one=1'
-    end
+      after :all do
+        set_option(:google_crawlable => @original.first)
+      end
 
-    it "should handle no query string" do
-      Ajax.hashed_url_from_traditional('/Beyonce').should == '/#!/Beyonce'
-    end
+      describe "hashed_url_from_traditional" do
+        it "should handle a query string" do
+          Ajax.hashed_url_from_traditional('/Beyonce?one=1').should == fragment + 'Beyonce?one=1'
+        end
 
-    it "should handle special characters" do
-      Ajax.hashed_url_from_traditional('/beyoncé').should == '/#!/beyonc%C3%A9'
-      Ajax.hashed_url_from_traditional('/red hot').should == '/#!/red%20hot'
-    end
+        it "should ignore the fragment" do
+          Ajax.hashed_url_from_traditional('/Beyonce?one=1#fragment').should == fragment + 'Beyonce?one=1'
+        end
 
-    DOMAINS.each do |domain|
-      it "should work for domain #{domain}" do
-        Ajax.hashed_url_from_traditional("http://#{domain}/playlists").should == "http://#{domain}/#!/playlists"
+        it "should handle no query string" do
+          Ajax.hashed_url_from_traditional('/Beyonce').should == fragment + 'Beyonce'
+        end
+
+        it "should handle special characters" do
+          Ajax.hashed_url_from_traditional('/beyoncé').should == fragment + 'beyonc%C3%A9'
+          Ajax.hashed_url_from_traditional('/red hot').should == fragment + 'red%20hot'
+        end
+
+        DOMAINS.each do |domain|
+          it "should work for domain #{domain}" do
+            Ajax.hashed_url_from_traditional("http://#{domain}/playlists").should == "http://#{domain}#{fragment}playlists"
+          end
+        end
+      end
+
+      describe "hashed_url_from_fragment" do
+        it "should strip double slashes" do
+          Ajax.hashed_url_from_fragment('/Beyonce#/Akon').should == fragment + 'Akon'
+          Ajax.hashed_url_from_fragment('/Beyonce#Akon').should == fragment + 'Akon'
+        end
+
+        it "should handle special characters" do
+          Ajax.hashed_url_from_fragment('/#/beyoncé').should == fragment + 'beyonc%C3%A9'
+          Ajax.hashed_url_from_fragment('/#/red hot').should == fragment + 'red%20hot'
+        end
+
+        it "should handle special characters" do
+          Ajax.hashed_url_from_fragment('/#!/beyoncé').should == fragment + 'beyonc%C3%A9'
+          Ajax.hashed_url_from_fragment('/#!/red hot').should == fragment + 'red%20hot'
+        end
+
+        it "should handle no fragment" do
+          Ajax.hashed_url_from_fragment('/Beyonce').should == fragment
+        end
+
+        DOMAINS.each do |domain|
+          it "should work for domain #{domain}" do
+            Ajax.hashed_url_from_fragment("http://#{domain}").should == "http://#{domain}#{fragment}"
+            Ajax.hashed_url_from_fragment("http://#{domain}/").should == "http://#{domain}#{fragment}"
+            Ajax.hashed_url_from_fragment("http://#{domain}/Beyonce/#/playlists").should == "http://#{domain}#{fragment}playlists"
+            Ajax.hashed_url_from_fragment("http://#{domain}/Beyonce/#!/playlists").should == "http://#{domain}#{fragment}playlists"
+          end
+        end
       end
     end
   end
 
-  describe "(URL) hashed_url_from_fragment" do
-    it "should strip double slashes" do
-      Ajax.hashed_url_from_fragment('/Beyonce#/Akon').should == '/#!/Akon'
-      Ajax.hashed_url_from_fragment('/Beyonce#Akon').should == '/#!/Akon'
-    end
-
-    it "should handle special characters" do
-      Ajax.hashed_url_from_fragment('/#/beyoncé').should == '/#!/beyonc%C3%A9'
-      Ajax.hashed_url_from_fragment('/#/red hot').should == '/#!/red%20hot'
-    end
-
-    it "should handle special characters" do
-      Ajax.hashed_url_from_fragment('/#!/beyoncé').should == '/#!/beyonc%C3%A9'
-      Ajax.hashed_url_from_fragment('/#!/red hot').should == '/#!/red%20hot'
-    end
-
-    it "should handle no fragment" do
-      Ajax.hashed_url_from_fragment('/Beyonce').should == '/#!/'
-    end
-
-    DOMAINS.each do |domain|
-      it "should work for domain #{domain}" do
-        Ajax.hashed_url_from_fragment("http://#{domain}").should == "http://#{domain}/#!/"
-        Ajax.hashed_url_from_fragment("http://#{domain}/").should == "http://#{domain}/#!/"
-        Ajax.hashed_url_from_fragment("http://#{domain}/Beyonce/#/playlists").should == "http://#{domain}/#!/playlists"
-        Ajax.hashed_url_from_fragment("http://#{domain}/Beyonce/#!/playlists").should == "http://#{domain}/#!/playlists"
-      end
-    end
-  end
-
-  describe "(boolean) url_is_root?" do
+  describe "url_is_root?" do
     it "should detect root urls" do
       Ajax.url_is_root?('/#/Beyonce?query2').should be(true)
       Ajax.url_is_root?('/#!/Beyonce?query2').should be(true)
@@ -103,7 +117,7 @@ describe 'Ajax::UrlHelpers' do
     end
   end
 
-  describe "(boolean) is_hashed_url?" do
+  describe "is_hashed_url?" do
     it "should return false for fragments that don't start with /" do
       Ajax.is_hashed_url?('/Beyonce#Akon').should be(false)
       Ajax.is_hashed_url?('/Beyonce?query#Akon/').should be(false)
@@ -131,7 +145,7 @@ describe 'Ajax::UrlHelpers' do
     end
   end
 
-  describe "(URL) traditional_url_from_fragment" do
+  describe "traditional_url_from_fragment" do
     it "should handle slashes" do
       Ajax.traditional_url_from_fragment('/Beyonce#Akon').should == '/Akon'
       Ajax.traditional_url_from_fragment('/Beyonce#/Akon').should == '/Akon'

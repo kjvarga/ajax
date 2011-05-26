@@ -1,7 +1,12 @@
 module Ajax
   module Helpers
     module UrlHelper
-      FRAGMENT = '/#!/'
+      # Return the URL fragment to use when building URLs, including slashes.
+      # E.g. '/#/' for a traditional fragment.  Depends on the Ajax.google_crawlable?
+      # setting.
+      def fragment_string
+        Ajax.google_crawlable? ? '/#!/' : '/#/'
+      end
 
       # Return a boolean indicating whether the given URL points to the
       # root path.
@@ -20,7 +25,7 @@ module Ajax
 
       # Return a hashed URL using the fragment of <tt>url</tt>
       def hashed_url_from_fragment(url)
-        url_host(url) + strip_slashes(FRAGMENT + normalized_url_fragment(url))
+        url_host(url) + strip_slashes(fragment_string + normalized_url_fragment(url))
       end
 
       # Return a traditional URL from the fragment of <tt>url</tt>
@@ -31,7 +36,7 @@ module Ajax
       # Return a hashed URL formed from a traditional <tt>url</tt>
       def hashed_url_from_traditional(url)
         uri = encode_and_parse_url(url)
-        hashed_url = url_host(url) + strip_slashes(FRAGMENT + (uri.path || ''))
+        hashed_url = url_host(url) + strip_slashes(fragment_string + (uri.path || ''))
         hashed_url += ('?' + uri.query) unless uri.query.nil?
         hashed_url
       end
@@ -54,7 +59,7 @@ module Ajax
       def normalized_url_fragment(url)
         '/'+ url_fragment(url).sub(/^\!?\/*/, '')
       end
-            
+
       protected
 
       # Globally replace double slashes (//) with single slashes (/) and return
