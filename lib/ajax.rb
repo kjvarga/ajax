@@ -61,7 +61,7 @@ module Ajax
   #
   # Disabled by default.
   def self.lazy_load_assets?
-    @lazy_load_assets.nil? ? false : !!@lazy_load_assets
+    !!@lazy_load_assets
   end
 
   # Set to false to disable lazy loading assets.  Callbacks will
@@ -72,6 +72,20 @@ module Ajax
   # run.
   def self.lazy_load_assets=(value)
     @lazy_load_assets = !!value
+  end
+
+  # Return a boolean indicating whether to use Google crawlable
+  # URLs.
+  #
+  # Off by default.
+  def self.google_crawlable?
+    !!@google_crawlable
+  end
+
+  # Set to true to enable Google crawlable URLS i.e. /#!/.
+  # The fragment must start with an exclamation point.
+  def self.google_crawlable=(value)
+    @google_crawlable = !!value
   end
 
   # Return a boolean indicating whether the plugin is being mock tested.

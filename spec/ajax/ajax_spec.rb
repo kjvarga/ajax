@@ -24,4 +24,8 @@ describe Ajax do
   it "should have an Application instance" do
     Ajax.app.should be_a(Ajax::Application)
   end
+
+  it "google crawlable should be off by default" do
+    Ajax.google_crawlable?.should be_false
+  end
 end
