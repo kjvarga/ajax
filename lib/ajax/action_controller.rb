@@ -169,8 +169,8 @@ module Ajax
 
       # If we have the full referrer in Ajax-Info, use that because it
       # includes the fragment.
-      if url == request.headers["Referer"] && !request.headers['Ajax-Info'].blank? && !request.headers['Ajax-Info']['referer'].blank?
-        url = request.headers['Ajax-Info']['referer']
+      if url == request.headers["Referer"] && !Ajax.get_header(request, :referer).blank?
+        url = Ajax.get_header(request, :referer)
         Ajax.logger.debug("[ajax] using referer #{url} from Ajax-Info")
       end
 
