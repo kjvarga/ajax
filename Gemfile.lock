@@ -1,7 +1,7 @@
 PATH
   remote: ./
   specs:
-    ajax (1.2.1)
+    ajax (1.2.2)
       json
       rack
 
