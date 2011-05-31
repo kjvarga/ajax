@@ -3,6 +3,18 @@ require 'spec_helper'
 include Ajax::Helpers::RequestHelper
 
 describe 'Ajax::Helpers::RequestHelpers' do
+  describe "get_header" do
+    it "should handle missing Ajax-Info" do
+      get_header({}, :dne).should == nil
+    end
+
+    it "should handle missing Ajax-Info" do
+      request = Object.new
+      request.stubs(:headers => nil)
+      get_header(request, :dne).should == nil
+    end
+  end
+
   describe 'set_header' do
     before :each do
       @headers = {}

@@ -55,7 +55,7 @@ module Ajax
       # <tt>key</tt> Symbol or String hash key, converted to String
       def get_header(object, key)
         headers = object.is_a?(Hash) ? object : object.headers # ::ActionController::Request
-        unserialize_hash(headers["Ajax-Info"])[key.to_s]
+        hash = unserialize_hash(headers && headers["Ajax-Info"])[key.to_s]
       end
 
       # Set one or more paths that can be accessed directly without the AJAX framework.
