@@ -235,7 +235,7 @@ window.location.href = #{url.to_json};
 </script>
 END
         else
-          Ajax.logger.info("[ajax] not detecting we are xhr. Hard redirect!")
+          #Ajax.logger.info("[ajax] not detecting we are xhr. Hard redirect!")
           return false
         end
       end
