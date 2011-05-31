@@ -476,7 +476,7 @@ var Ajax = function(options) {
   self.setRequestHeaders = function(XMLHttpRequest) {
     var data = $(self.default_container).data('ajax-info');
     if (data === undefined || data === null) { data = {}; }
-    data['referer'] = document.location.href;
+    data['referer'] = document.location.href.replace(/([?&])_=[^&]*/, "$1");
     XMLHttpRequest.setRequestHeader('AJAX_INFO', $.toJSON(data));
   };
 
