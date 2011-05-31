@@ -157,7 +157,6 @@ module Ajax
         end
       Ajax.set_header(response, :layout, layout_name)
       Ajax.set_header(response, :controller, self.class.controller_name)
-      response.headers['Ajax-Info'] = Ajax.send(:serialize_hash, response.headers['Ajax-Info'])
     end
 
     # Perform special processing on the response if we need to.
