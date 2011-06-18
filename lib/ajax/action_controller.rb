@@ -199,22 +199,20 @@ module Ajax
       # Don't store session[:redirected_to] if doing a special redirect otherwise
       # when the next request for root comes in it will think we really want
       # to display the home page.
+      #
+      # Use the hashed part of the URL in the browser but replace the protocol
+      # and host.
+      #
+      # +url+ is in it's hashed form so it ends with /# or /#!
       if special_redirect
         session[:redirected_to] = nil
         Ajax.logger.info("[ajax] returning special redirect JS")
         render :layout => false, :text => <<-END
 <script type="text/javascript">
 var url = #{url.to_json};
-var hash = document.location.hash;
+var hash = $.address.value();
 
-// Remove leading # from the fragment
-if (hash.charAt(0) == '#') {
-  hash = hash.substr(1);
-}
-
-// Remove leading / from the fragment if the URL already ends in a /
-// This prevents double-slashes.  Note we can't just replace all
-// double-slashes because the protocol includes //.
+// Prevent double slashes when combining the URL and the fragment
 if (url.charAt(url.length - 1) == '/' && hash.charAt(0) == '/') {
   hash = hash.substr(1);
 }
