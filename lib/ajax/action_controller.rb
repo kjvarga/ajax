@@ -210,13 +210,20 @@ module Ajax
         render :layout => false, :text => <<-END
 <script type="text/javascript">
 var url = #{url.to_json};
-var hash = $.address.value();
-
-// Prevent double slashes when combining the URL and the fragment
-if (url.charAt(url.length - 1) == '/' && hash.charAt(0) == '/') {
+var hash = document.location.hash;
+// Remove leading # from fragment
+if (hash.charAt(0) == '#') {
   hash = hash.substr(1);
 }
-
+// Remove leading ! from fragment
+if (hash.charAt(0) == '!') {
+  hash = hash.substr(1);
+}
+// Remove leading / from the fragment if the URL already ends in a /
+// to prevent double-slashes.
+if (hash.charAt(0) == '/' && url.charAt(url.length - 1) == '/') {
+  hash = hash.substr(1);
+}
 document.location.href = url + hash;
 </script>
 END
