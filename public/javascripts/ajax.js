@@ -370,7 +370,6 @@ var Ajax = function(options) {
       $.address.value(url);
       return false;
     } else {
-      //console.log('going ahead with load');
       self.loadPage({
         url: url
       });
@@ -434,7 +433,6 @@ var Ajax = function(options) {
       complete: function(XMLHttpRequest, responseText) {
         // Scroll to the top of the page.
         $(document).scrollTop(0);
-        self.hideLoadingImage();
         self.loaded = true;
         self.current_request = undefined;
       },
@@ -544,47 +542,55 @@ var Ajax = function(options) {
 
     self.last_request_object = XMLHttpRequest;
     console.log("[ajax] in response handler! status: " + self.last_request_object.status);
-    if(self.last_request_object.status == 0) {
+    if (self.last_request_object.status == 0) {
       console.log("[ajax] aborting response handler! ");
       return;
     }
-    var data = self.processResponseHeaders(XMLHttpRequest);
+    var data, container;
+    data      = self.processResponseHeaders(XMLHttpRequest);
+    container = data.container === undefined ? $(self.default_container) : $(data.container);
 
+    /**
+     * Soft redirect and return
+     */
     if (data.soft_redirect !== undefined) {
       console.log('[ajax] issuing soft redirect to ' + data.soft_redirect);
       $.address.value(data.soft_redirect);
       return;
     };
 
-    var container = data.container === undefined ? $(self.default_container) : $(data.container);
     /**
-     * Full page response.  The best we can do is to extract the body
-     * and display that.  Additionally, if the container to update
-     * is present in the response, just use that.
+     * Handle full page response.  The best we can do is to extract the body
+     * and display that.  If the container to update is present in the response,
+     * replace the current container's content with the container's content
+     * from the response.
+     *
+     * We need this because Rails exception page is a full-page response.
      */
     if (responseText.search(/<\s*body[^>]*>/) != -1) {
-      var start = responseText.search(/<\s*body[^>]*>/);
+      var start, end, body;
+      start  = responseText.search(/<\s*body[^>]*>/);
       start += responseText.match(/<\s*body[^>]*>/)[0].length;
-      var end   = responseText.search(/<\s*\/\s*body\s*\>/);
+      end    = responseText.search(/<\s*\/\s*body\s*\>/);
 
       console.log('[ajax] extracted body ['+start+'..'+end+'] chars');
       responseText = responseText.substr(start, end - start);
 
-      var body = $(responseText);
+      body = $(responseText);
       if (body.size() > 0 && body.find(container.selector).size() > 0) {
         responseText = body.find(container.selector).html();
       }
     }
 
-    // Handle special header instructions
-    //  title    - set page title
-    //  tab      - activate a tab
-    //  assets   - load assets
-    //  callbacks - execute one or an array of callbacks
+    /**
+     * Handle special headers:
+     * * title    - set page title
+     * * tab      - activate a tab
+     * * assets   - load assets
+     * * callbacks - execute one or an array of callbacks
+     */
     if (data.title !== undefined) {
       console.log('[ajax] set page title '+data.title);
-      // commenting this out until we fix ' char bug, removing % chars from page titles for now
-      // $.address.title(encodeURIComponent(data.title));
       $.address.title(data.title);
     }
 
@@ -647,6 +653,7 @@ var Ajax = function(options) {
       self.executeCallbacks();
     }
 
+    self.hideLoadingImage();
     $(document).trigger('ajax.onload');
 
     /**
@@ -687,13 +694,6 @@ var Ajax = function(options) {
    * Stop watching the mouse position.
    */
   self.hideLoadingImage = function() {
-    // check if a new request has already started
-    try {
-      if (self.current_request && self.current_request.status == 0) {
-        console.log("[AJAX] aborting hideLoadingImage.. ");
-        return;
-      }
-    } catch(e) {}
     if (!self.show_loading_image) { return; }
     if (!self.hide_loading_image_callback) {
       $(document).unbind('mousemove', self.updateImagePosition);
@@ -757,6 +757,21 @@ var Ajax = function(options) {
       top:      e.pageY + 14,
       left:     e.pageX + 14
     });
+  };
+
+  /**
+   * Execute +callback+ once, after the next page
+   * has loaded.
+   */
+  self.onNextPageLoad = function(callback) {
+    $(document).one('ajax.onload', callback);
+  };
+
+  /**
+   * Execute +callback+ after every page load.
+   */
+  self.onEveryPageLoad = function(callback) {
+    $(document).bind('ajax.onload', callback);
   };
 
   /**
