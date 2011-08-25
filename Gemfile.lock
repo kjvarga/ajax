@@ -2,18 +2,8 @@ PATH
   remote: ./
   specs:
     ajax (1.2.5)
-      actionpack (= 3.0.10)
-      activesupport (= 3.0.10)
-      ajax
-      bundler (~> 1.0.0)
-      jeweler
       json
-      mocha (~> 0.9.10)
       rack
-      rspec (~> 2.0)
-      ruby-debug (= 0.10.3)
-      ruby-debug-base (= 0.10.3)
-      test-unit (= 1.2.3)
 
 GEM
   remote: http://rubygems.org/
@@ -39,14 +29,9 @@ GEM
     diff-lcs (1.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
-    git (1.2.5)
     hoe (2.12.2)
       rake (~> 0.8)
     i18n (0.5.0)
-    jeweler (1.6.4)
-      bundler (~> 1.0)
-      git (>= 1.2.5)
-      rake
     json (1.5.3)
     linecache (0.46)
       rbx-require-relative (> 0.0.4)
@@ -83,7 +68,6 @@ DEPENDENCIES
   activesupport (= 3.0.10)
   ajax!
   bundler (~> 1.0.0)
-  jeweler
   mocha (~> 0.9.10)
   rspec (~> 2.0)
   ruby-debug (= 0.10.3)
