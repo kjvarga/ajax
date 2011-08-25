@@ -1,9 +1,19 @@
 PATH
   remote: ./
   specs:
-    ajax (1.2.4)
+    ajax (1.2.5)
+      actionpack (= 3.0.10)
+      activesupport (= 3.0.10)
+      ajax
+      bundler (~> 1.0.0)
+      jeweler
       json
+      mocha (~> 0.9.10)
       rack
+      rspec (~> 2.0)
+      ruby-debug (= 0.10.3)
+      ruby-debug-base (= 0.10.3)
+      test-unit (= 1.2.3)
 
 GEM
   remote: http://rubygems.org/

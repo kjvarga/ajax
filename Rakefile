@@ -44,10 +44,6 @@ def version
   File.read('VERSION').chomp
 end
 
-def gem_file
-  "#{name}-#{version}.gem"
-end
-
 #
 # Release Tasks
 # @see https://github.com/mojombo/rakegem
@@ -65,9 +61,9 @@ task :release => :build do
   #sh "git push origin v#{version}" # don't release gem
 end
 
-desc "Build #{gem_file} into the pkg directory"
+desc "Build gem into the pkg/ directory"
 task :build => :gemspec do
   sh "mkdir -p pkg"
-  sh "gem build #{gemspec_file}"
-  sh "mv #{gem_file} pkg"
+  sh "gem build #{name}.gemspec"
+  sh "mv #{name}-#{version}.gem pkg"
 end
