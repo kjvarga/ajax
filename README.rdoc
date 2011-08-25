@@ -10,6 +10,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
+* v1.2.5: Loading image improvements. Add onNextPageLoad and onEveryPageLoad callbacks
 * v1.2.4: Fix special redirect for Google-crawlable URLs
 * v1.2.2: Fix redirect issue when redirecting back to the referer; Strip cache-busting parameter from the Referer URL that is sent in the Ajax-Info
 * v1.2.1: Make Google-crawlable URLs configurable and default it off for backwards compatibility; Snapshot requests are always supported regardless of the value of </tt>crawlable</tt>.

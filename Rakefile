@@ -32,17 +32,42 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace']
 end
 
-namespace :release do
-  desc "Release a new patch version"
-  task :patch do
-    Rake::Task['version:bump:patch'].invoke
-    Rake::Task['release:current'].invoke
-  end
+#
+# Helpers
+#
 
-  desc "Release the current version (e.g. after a version bump).  This rebuilds the gemspec, pushes the updated code, tags it and releases to RubyGems"
-  task :current do
-    Rake::Task['github:release'].invoke
-    Rake::Task['git:release'].invoke
-    Rake::Task['gemcutter:release'].invoke
+def name
+  @name ||= Dir['*.gemspec'].first.split('.').first
+end
+
+def version
+  File.read('VERSION').chomp
+end
+
+def gem_file
+  "#{name}-#{version}.gem"
+end
+
+#
+# Release Tasks
+# @see https://github.com/mojombo/rakegem
+#
+
+desc "Create tag v#{version}, build the gem and push to Git"
+task :release => :build do
+  unless `git branch` =~ /^\* master$/
+    puts "You must be on the master branch to release!"
+    exit!
   end
+  sh "git commit --allow-empty -a -m 'Release #{version}'"
+  sh "git tag v#{version}"
+  sh "git push origin master"
+  #sh "git push origin v#{version}" # don't release gem
+end
+
+desc "Build #{gem_file} into the pkg directory"
+task :build => :gemspec do
+  sh "mkdir -p pkg"
+  sh "gem build #{gemspec_file}"
+  sh "mv #{gem_file} pkg"
 end
