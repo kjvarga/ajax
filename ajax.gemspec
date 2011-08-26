@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require 'rake/file_list'
-
 Gem::Specification.new do |s|
   s.name        = %q{ajax}
   s.version     = File.read('VERSION').chomp
@@ -16,5 +14,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'json'
   s.add_dependency 'rack'
   s.test_files  = []
-  s.files       = Rake::FileList["[A-Z]*", "init.rb", "{app,config,lib,public,rails,tasks}/**/*"] - Rake::FileList['spec/rails*/**/*']
+  s.files       = Dir.glob(["[A-Z]*", "init.rb", "{app,config,lib,public,rails,tasks}/**/*"]) - Dir.glob(['spec/rails*/**/*'])
 end
