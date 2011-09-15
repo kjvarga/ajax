@@ -594,11 +594,6 @@ var Ajax = function(options) {
       $.address.title(data.title);
     }
 
-    if (data.tab !== undefined) {
-      console.log('[ajax] activated tab '+data.tab);
-      $(data.tab).trigger('activate');
-    }
-
     /**
      * Load stylesheets
     */
@@ -621,6 +616,14 @@ var Ajax = function(options) {
     console.log('[ajax] got ajax-info ', data);
     container.data('ajax-info', data);
     container.html(responseText);
+
+    /**
+     * Activate tab
+    */
+    if (data.tab !== undefined) {
+      console.log('[ajax] activated tab '+data.tab);
+      $(data.tab).trigger('activate');
+    }
 
     /**
      * Include callbacks from Ajax-Info
