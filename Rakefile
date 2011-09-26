@@ -43,4 +43,5 @@ task :build do
   sh "mkdir -p pkg"
   sh "gem build #{gemspec_file}"
   sh "mv #{gem_file} pkg"
+  sh "bundle --local"
 end
