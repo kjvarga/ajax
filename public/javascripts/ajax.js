@@ -479,6 +479,21 @@ var Ajax = function(options) {
   };
 
   /**
+   * setAjaxInfoOnContainer
+   *
+   * A helper method for setting a hash of values on the
+   * default container's Ajax-Info data hash.
+   *
+   * hash - Hash of info to set e.g. { layout: 'two_column' }
+   */
+  self.setAjaxInfoOnContainer = function(hash) {
+    var data = $(self.default_container).data('ajax-info');
+    if (data === undefined || data === null) { data = {}; }
+    jQuery.extend(data, hash);
+    $(self.default_container).data('ajax-info', data);
+  };
+  
+  /**
    * host
    *
    * Return the current host with protocol and with no trailing slash.
