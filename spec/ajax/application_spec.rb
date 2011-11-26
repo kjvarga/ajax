@@ -14,7 +14,7 @@ describe Ajax::Application do
       '3.0.1'  => [[nil, true], [1, false], [2, false], [3, true]],
       '3.0.11' => [[nil, true], [1, false], [2, false], [3, true]]
     }
-
+    
     tests.each do |version, results|
       it "should identify #{version.inspect} correctly" do
         silence_warnings { Rails = stub(:version => version) }
@@ -22,6 +22,28 @@ describe Ajax::Application do
           @app.rails?(arg).should == value
         end
       end
+    end
+
+    it "should match on major version" do
+      silence_warnings { Rails = stub(:version => '3.1.0') }
+      @app.rails?(:>=, 3).should be_true
+      @app.rails?(:<=, 3).should be_true
+      @app.rails?(3).should be_true
+      @app.rails?(2).should be_false
+      @app.rails?(:>=, 2).should be_true
+      @app.rails?(:<=, 2).should be_false
+    end
+    
+    it "should match on major.minor version" do
+      silence_warnings { Rails = stub(:version => '3.1.0') }
+      @app.rails?(:>=, 3.1).should be_true
+      @app.rails?(:>=, 3.2).should be_false
+      @app.rails?(:<=, 3.1).should be_true
+      @app.rails?(:<=, 3.2).should be_true
+      @app.rails?(:<=, 3.0).should be_false
+      @app.rails?(3.1).should be_true
+      @app.rails?(3.0).should be_false
+      @app.rails?(3.2).should be_false
     end
   end
 

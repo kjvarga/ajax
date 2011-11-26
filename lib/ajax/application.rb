@@ -5,24 +5,30 @@ module Ajax
   # which version of Rails we are running under.
   class Application
     # Return a boolean indicating whether the Rails constant is defined.
-    # Pass a <tt>version</tt> integer to determine whether the major version
-    # of Rails matches <tt>version</tt>.
+    # It cannot identify Rails < 2.1
     #
-    # Example: rails?(3) returns true when Rails.version.to_i == 3.
-    #
-    # Returns false if Rails is not defined or the major version does not match.
-    def rails?(version=nil)
-      !!(if version.nil?
-        defined?(::Rails)
-      elsif defined?(::Rails)
-        if ::Rails.respond_to?(:version)
-          ::Rails.version.to_i == version
+    # Example:
+    # rails?(3) => true if Rails major version is 3
+    # rails?(3.0) => true if Rails major.minor version is 3.0
+    # rails?(:>=, 3) => true if Rails major version is >= 3
+    # rails?(:>=, 3.1) => true if Rails major.minor version is >= 3.1
+    def rails?(*args)
+      version, comparator = args.pop, (args.pop || :==)
+      result =
+        if version.nil?
+          defined?(::Rails)
+        elsif defined?(::Rails)
+          if ::Rails.respond_to?(:version)
+            rails_version = Rails.version.to_f
+            rails_version = rails_version.floor if version.is_a?(Integer)
+            rails_version.send(comparator, version.to_f)
+          else
+            version.to_f <= 2.0
+          end
         else
-          version <= 2 # Rails.version defined in 2.1.0
+          false
         end
-      else
-        false
-      end)
+      !!result
     end
 
     def root
@@ -47,7 +53,7 @@ module Ajax
         require 'ajax/action_view'
 
         Ajax.logger = ::Rails.logger
-        
+
         # Customize rendering.  Include custom headers and don't render the layout for AJAX.
         ::ActionController::Base.send(:include, Ajax::ActionController)
 
