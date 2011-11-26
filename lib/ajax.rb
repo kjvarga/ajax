@@ -115,4 +115,4 @@ module Ajax
   self.app = Ajax::Application.new
 end
 
-require 'ajax/railtie' if Ajax.app.rails?(3)
+require 'ajax/railtie' if Ajax.app.rails?(:>=, 3)

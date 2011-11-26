@@ -46,7 +46,7 @@ module Ajax
     # Hooks for Rails 3 are installed using Railties.
     def init
       return unless rails?
-      if rails?(3)
+      if rails?(:>=, 3)
         require 'ajax/railtie'
       else
         require 'ajax/action_controller'

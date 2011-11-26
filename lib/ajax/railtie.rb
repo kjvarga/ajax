@@ -1,5 +1,6 @@
 require 'ajax/action_controller'
 require 'ajax/action_view'
+require 'ajax/action_view_renderer' if Ajax.app.rails?(:>=, 3.1)
 
 module Ajax
   class Railtie < Rails::Railtie
@@ -11,13 +12,15 @@ module Ajax
       ActiveSupport.on_load :action_view do
         include Ajax::ActionView
 
-        self.class_eval do
-          unless instance_methods.include?('_render_layout_with_tracking')
-            def _render_layout_with_tracking(layout, locals, &block)
-              controller.instance_variable_set(:@_rendered_layout, layout)
-              _render_layout_without_tracking(layout, locals, &block)
+        if Ajax.app.rails?(:<, 3.1)
+          self.class_eval do
+            if !instance_methods.include?('_render_layout_with_tracking')
+              def _render_layout_with_tracking(layout, locals, &block)
+                controller.instance_variable_set(:@_rendered_layout, layout)
+                _render_layout_without_tracking(layout, locals, &block)
+              end
+              alias_method_chain :_render_layout, :tracking
             end
-            alias_method_chain :_render_layout, :tracking
           end
         end
       end

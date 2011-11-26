@@ -150,8 +150,13 @@ module Ajax
     # layouts/simple.html.erb or layouts/ajax/simple.html.erb are rendered the
     # value of +layout+ would be <tt>'simple'</tt> in both cases.
     def serialize_ajax_info
-      layout_name = if Ajax.app.rails?(3)
-          @_rendered_layout && @_rendered_layout.variable_name
+      layout_name =
+        if Ajax.app.rails?(3)
+          if @_rendered_layout.is_a?(String)
+            @_rendered_layout =~ /.*\/([^\/]*)/ ? $1 : @_rendered_layout
+          elsif @_rendered_layout
+            @_rendered_layout.variable_name
+          end
         else
           active_layout
         end
