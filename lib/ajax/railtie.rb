@@ -1,6 +1,5 @@
 require 'ajax/action_controller'
 require 'ajax/action_view'
-require 'ajax/action_view_renderer' if Ajax.app.rails?(:>=, 3.1)
 
 module Ajax
   class Railtie < Rails::Railtie
@@ -10,6 +9,7 @@ module Ajax
 
     initializer 'ajax.action_integration' do
       ActiveSupport.on_load :action_view do
+        require 'ajax/action_view_renderer' if Ajax.app.rails?(:>=, 3.1)
         include Ajax::ActionView
 
         if Ajax.app.rails?(:<, 3.1)
