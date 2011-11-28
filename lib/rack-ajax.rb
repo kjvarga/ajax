@@ -61,7 +61,9 @@ module Rack
 
     # Convert the environment hash to yaml so it can be unserialized later
     def encode_env(env)
+      env = env.dup
       env['rack.session'] = env['rack.session'].to_hash if env['rack.session'].is_a?(Hash)
+      env.delete_if { |k, v| k =~ /action_dispatch/ }
       env.to_yaml(:Encoding => :Utf8)
     end
   end
