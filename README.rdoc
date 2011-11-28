@@ -10,6 +10,7 @@ As of May 2010 Ajax is being used live in production on kazaa.com[http://www.kaz
 
 == Changelog
 
+* v1.2.8: Support Rails 3.1
 * v1.2.7: Activate tabs after inserting the response into the page
 * v1.2.5: Loading image improvements. Add onNextPageLoad and onEveryPageLoad callbacks
 * v1.2.4: Fix special redirect for Google-crawlable URLs
