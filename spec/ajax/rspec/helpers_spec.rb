@@ -1,12 +1,8 @@
 require "spec_helper"
 
 describe Ajax::RSpec::OptionHelpers do
-
-  describe_context = self
-
   it "should be available everywhere" do
-    describe_context.methods.include?('with_option').should be_true
-    methods.include?('with_option').should be_true
+    respond_to?('with_option').should be_true
   end
 
   describe "set_option" do

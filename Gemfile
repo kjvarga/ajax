@@ -7,6 +7,5 @@ gem 'bundler'
 group :development, :test do
   gem 'mocha'
   gem 'rspec'
-  gem 'ruby-debug'
-  gem 'ruby-debug-base'
+  gem 'ruby-debug19', :require => 'ruby-debug'
 end

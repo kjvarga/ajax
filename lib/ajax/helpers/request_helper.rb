@@ -68,11 +68,11 @@ module Ajax
       #
       # The string and regex paths are modified to match full URLs by prepending
       # them with the appropriate regular expression.
-      def exclude_paths(paths=nil, expand = true)
+      def exclude_paths(paths=[], expand = true)
         if !instance_variable_defined?(:@exclude_paths)
           @exclude_paths = []
         end
-        (paths || []).each do |path|
+        (paths.is_a?(Array) ? paths : [paths]).each do |path|
           if expand
             @exclude_paths << /^(\w+\:\/\/[^\/]+\/?)?#{path.to_s}$/
           else
